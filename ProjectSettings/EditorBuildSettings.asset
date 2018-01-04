@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scene/Launcher.unity
+    guid: 5bb2dc80c20fabb42801312bb847237e
+  - enabled: 0
+    path: 
+    guid: d4c2093262142ba49a09e8dceafe7361
+  - enabled: 0
+    path: 
+    guid: bc865dd7116041c4f9990a74ee016698
+  - enabled: 0
+    path: 
+    guid: 740c769564c02b3488a24449376eff17
+  - enabled: 0
+    path: 
+    guid: cad09c3c2e018604c974423140c2deb9
+  - enabled: 0
+    path: 
+    guid: 65f16e5bae6553440a11c711493a6eb1
+  - enabled: 1
+    path: Assets/Scene/Complete/Tropical.unity
+    guid: ee677a76cd8cee441b16d79bdbb88128
+  - enabled: 1
+    path: Assets/Scene/Complete/SchoolGymDay.unity
+    guid: e6a6468f9e0d40943bbfd83ad00172de
+  - enabled: 0
+    path: 
+    guid: d3e93d191c3b285499fd5f997b4011b0
+  - enabled: 0
+    path: 
+    guid: 5f6a7b83d87229d43b22184e9803ed0d
+  - enabled: 0
+    path: Assets/Scene/GolfTest.unity
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 0f0940461318c8d4583efa217c9b26c8
+  - enabled: 0
+    path: 
+    guid: be84e545242ca0c41a396f61f3e68559

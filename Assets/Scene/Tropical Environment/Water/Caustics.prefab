@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1000012856763058}
+  m_IsPrefabParent: 1
+--- !u!1 &1000012856763058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4000011996077076}
+  - component: {fileID: 119000010823714080}
+  - component: {fileID: 114000012265033660}
+  m_Layer: 0
+  m_Name: Caustics
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4000011996077076
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012856763058}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
+  m_LocalPosition: {x: 256, y: 78.8, z: 288}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114000012265033660
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012856763058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db0bfb634f3cbd44b17a32a17909267, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  images:
+  - {fileID: 2800000, guid: 8f73045fe260a1b41ae0ed08a11e457e, type: 3}
+  - {fileID: 2800000, guid: c8b867a657471694eae2acc00ea55976, type: 3}
+  - {fileID: 2800000, guid: 9eed4b32fc2c97740afc9605182cf083, type: 3}
+  - {fileID: 2800000, guid: 0216273286a10084fac53723c9ecacd1, type: 3}
+  - {fileID: 2800000, guid: 59269c1e312e40b448a947ea11cea0a5, type: 3}
+  - {fileID: 2800000, guid: 9d0549a3e382aaf4aaea898c0a9abf5a, type: 3}
+  - {fileID: 2800000, guid: d9c43f0d593dd934f8cf2def7af9f3b5, type: 3}
+  - {fileID: 2800000, guid: d34facf38d34f1f4db6826b932a74230, type: 3}
+  - {fileID: 2800000, guid: 405401a744f104e42a555150861e5e34, type: 3}
+  - {fileID: 2800000, guid: b59c3deaa7ab1444b87cb94c44c643b2, type: 3}
+  - {fileID: 2800000, guid: 121a9c48e4ac69646bbc67f6cd91a2f2, type: 3}
+  - {fileID: 2800000, guid: 07dd37a6193d0c142bd009e2c5bc7c77, type: 3}
+  - {fileID: 2800000, guid: bc3c0b0789d5d6341993be892eaa3cb7, type: 3}
+  - {fileID: 2800000, guid: 17b957b7c4a6063428d33b48d5d982d2, type: 3}
+  - {fileID: 2800000, guid: 20838e709e7126f46a68a17e7059f12d, type: 3}
+  - {fileID: 2800000, guid: b25dea0e72de7e04c90ca6c09a69d217, type: 3}
+  Delay: 0.033
+  curImage: 0
+  setParameters: 1
+  CausticIntensity: 0
+  HeightCut: -33.9
+  UnderWaterCut: -20.3
+  CausticsSize: 0.15
+  UpdateProjector: 0
+--- !u!119 &119000010823714080
+Projector:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012856763058}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_NearClipPlane: 0.1
+  m_FarClipPlane: 500
+  m_FieldOfView: 180
+  m_AspectRatio: 1
+  m_Orthographic: 1
+  m_OrthographicSize: 1000
+  m_Material: {fileID: 2100000, guid: 8f85ea9dfa764e34bac8fbbc7948da98, type: 2}
+  m_IgnoreLayers:
+    serializedVersion: 2
+    m_Bits: 0
