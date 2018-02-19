@@ -1,0 +1,11 @@
+Fruits:apple,peach,watermelon,lemon,cherry,banana,blueberry
+Animals:whale,duck,owl,kangaroo,koala,cow,parrot,wolf,giraffe,reindeer
+Sports:badminton,hockey,bowling,tennis,baseball,boxing,swimming,golf
+Food:French fries,spaghetti,sushi,steak,meat balls,sandwich
+Drinks:yoghurt,smoothie,tea,soda,cider,beer
+Furniture:lamp,oven,book shelf,sofa,carpet,bath tub,arm chair
+Clothes:sneaker,pajama,necklace,hoodie,jeans
+Donald duck,Harry potter,Lord of the rings,tom and jerry,la la land
+Facebook,Tinder,Snapchat,Tesla,Ben&Jerry
+violin,trumpet,harp,organ,drum
+USB,powerbank,router,speaker,balloon

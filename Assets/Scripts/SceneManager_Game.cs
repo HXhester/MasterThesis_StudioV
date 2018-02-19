@@ -18,8 +18,9 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private GameObject[] _inGameRatingUI;
     private GameObject _screenUI;
 
+    private Dictionary<string, string> _categoryWordDict;
     private string[] _wordList;
-    private string[] _distanceList;   
+    private string[] _distanceList;
     private int _wordID;
     private int _distanceID;
 
@@ -66,23 +67,27 @@ public class SceneManager_Game : Photon.MonoBehaviour
         _inGameRatingUI[1].SetActive(false);
 
         // Only runs on master client
-        // if (PhotonNetwork.isMasterClient)
+        if (PhotonNetwork.isMasterClient)
         {
 	        if (_randomizeManager != null)
 	        {
                 // Get word list and distance list
-                _wordList = new string[_randomizeManager.WordList.Length];
+                _wordList = new string[_randomizeManager.CategoryWordDict.Count];
                 _distanceList = new string[_randomizeManager.DistanceList.Length];
+                _categoryWordDict = new Dictionary<string, string>();
 
-	            _randomizeManager.WordList.CopyTo(_wordList, 0);
+                _wordList = _randomizeManager.WordList;
 	            _randomizeManager.DistanceList.CopyTo(_distanceList, 0);
                 
                 // Randomize the listf
                 _randomizeManager.RandomizeTexts(_wordList);
                 _randomizeManager.RandomizeTexts(_distanceList);
-	        }          
 
-	        _wordID = 0;
+	            _categoryWordDict = _randomizeManager.CategoryWordDict;
+
+	        }
+
+            _wordID = 0;
             _distanceID = 0;
 
             AssignDistancesOnRopes();
@@ -239,13 +244,13 @@ public class SceneManager_Game : Photon.MonoBehaviour
         Debug.Log("wordID:" + wordID);
         if (wordID%2 == 0)
         {
-            _board1.GetComponent<Text>().text = word;
+            _board1.GetComponent<Text>().text = _categoryWordDict[word] + ":" + word;
             _board2.GetComponent<Text>().text = "It's your turn to guess.";
         }
         else
         {         
             _board1.GetComponent<Text>().text = "It's your turn to guess.";
-            _board2.GetComponent<Text>().text = word;
+            _board2.GetComponent<Text>().text = _categoryWordDict[word] + ":" + word;
         }
     }
 
