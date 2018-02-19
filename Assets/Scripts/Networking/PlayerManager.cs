@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using HTC.UnityPlugin.StereoRendering;
@@ -12,19 +13,14 @@ public class PlayerManager : Photon.PunBehaviour
 
     [Header("Local")]
     public OptitrackSkeletonAnimator localOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
-
-    public ScaleAdjust localScaleAdjust;
     public AudioListener listener;
 
     [Header("Remote")]
     public OptitrackSkeletonAnimator remoteOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
-
-    public ScaleAdjust remoteScaleAdjust;
     public Transform OptitrackHead;
 
     void Awake()
     {
-
         gameObject.name += photonView.viewID.ToString();
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
         //If the spawned avatar is mine
@@ -36,7 +32,6 @@ public class PlayerManager : Photon.PunBehaviour
             _camera.GetComponent<Camera>().enabled = true;
             _camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
             listener.enabled = true;
-            localScaleAdjust.enabled = true;
 
             localOptitrackAnimator.enabled = false;
             remoteOptitrackAnimator.enabled = false;
@@ -54,16 +49,32 @@ public class PlayerManager : Photon.PunBehaviour
             {
                 if (g.GetPhotonView().isMine)
                 {
-//                    g.GetComponent<PlayerManager>().SetLayerTo(this, "Remote");
 					g.GetComponent<PlayerManager>().localOptitrackAnimator.gameObject.SetActive(true);
 					g.GetComponent<PlayerManager>().remoteOptitrackAnimator.gameObject.SetActive(false);
 					//if the other avatar is mine then return. if no avatar is mine continue to show only remote/optitrack gameObject.
 					return;
                 }
             }
-			localOptitrackAnimator.gameObject.SetActive(false);
-			remoteOptitrackAnimator.gameObject.SetActive(true);
+            localOptitrackAnimator.gameObject.SetActive(false);
+            remoteOptitrackAnimator.gameObject.SetActive(true);
         }
+
+        // Master client should have HMD avatar enable to collect correct data
+        if (PhotonNetwork.isMasterClient)
+        {
+
+            if (GameManager.Instance.UsingVR)
+            {
+                localOptitrackAnimator.gameObject.SetActive(true);
+                remoteOptitrackAnimator.gameObject.SetActive(false);
+            }
+            else
+            {
+                localOptitrackAnimator.gameObject.SetActive(false);
+                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
+                remoteOptitrackAnimator.gameObject.SetActive(true);
+            }
+        }  
     }
 
     //This method is only called by Avatars
@@ -127,33 +138,17 @@ public class PlayerManager : Photon.PunBehaviour
         player.transform.parent = expressionController.transform;
     }
 
-    public void SetScale(Vector3 localScale)
+    public void SetScale(float scale)
     {
-        photonView.RPC("RPC_SetScale", PhotonTargets.OthersBuffered, new object[] {gameObject.name, localScale});
+        photonView.RPC("RPC_SetScale", PhotonTargets.AllBuffered, new object[] {gameObject.name, scale});
     }
 
     [PunRPC]
-    public void RPC_SetScale(string playerName, Vector3 localScale)
+    public void RPC_SetScale(string playerName, float scale)
     {
         Debug.Log("Setting scale of " + playerName + " on all clients");
-        //Debug.Log (GameObject.FindGameObjectWithTag ("ExpressionController").transform.Find(playerName));
-        foreach (Transform t in GameObject.FindGameObjectWithTag("ExpressionController").transform)
-        {
-            Debug.Log(t.name);
-        }
-        GameObject.Find(playerName).GetComponent<PlayerManager>().remoteScaleAdjust.transform.localScale = localScale;
-        GameObject.Find(playerName).GetComponent<PlayerManager>().localScaleAdjust.transform.localScale = localScale;
+        GameObject.Find(playerName).transform.localScale *= scale;
+        // Keep world scale of camerarig as 1,1,1
+        GameObject.Find(playerName).transform.Find("[CameraRig]").transform.localScale /= scale;
     }
-
-    public void SetHeadScale(Vector3 localScale)
-    {
-        photonView.RPC("RPC_SetHeadScale", PhotonTargets.OthersBuffered, new object[] {gameObject.name, localScale});
-    }
-
-    [PunRPC]
-    public void RPC_SetHeadScale(string playerName, Vector3 localScale)
-    {
-        GameObject.Find(playerName).GetComponent<PlayerManager>().OptitrackHead.localScale = localScale;
-    }
-
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon;
@@ -13,28 +14,29 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private GameObject _board2;
     private GameObject _rope1;
     private GameObject _rope2;
-    private GameObject[] _avatars;
-    
+    private GameObject[] _avatarHeads;
+    private GameObject[] _inGameRatingUI;
+    private GameObject _screenUI;
 
     private string[] _wordList;
     private string[] _distanceList;   
     private int _wordID;
-    private int _distanceID;   
+    private int _distanceID;
 
+    public float CurrentDistance;
     public bool HasStarted = false;  
     public float CountDownTime = 7f;   // Using count down 3min, 180s
     private float currentCountDown;
 
+    public KeyCode ChangeWordKey = KeyCode.Space;
+    public KeyCode ReStartKey = KeyCode.R;
+    public KeyCode ChangeRatingQuestionKey = KeyCode.Q;
+
     // UI section
     private Text _Timer;
-    [HideInInspector]
-    public GameObject[] InGameRating;
-    [HideInInspector]
-    public GameObject[] OnScreenRating;
-    private string[] _ratingList;
 
     void Start () {
-        _recordingManager = GetComponent<RecordingManager>();
+        _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
 
         _Timer = GameObject.Find("CountDownTimer").GetComponent<Text>();
         _Timer.gameObject.SetActive(false);
@@ -45,17 +47,23 @@ public class SceneManager_Game : Photon.MonoBehaviour
         _rope1 = GameObject.FindGameObjectWithTag("Rope1");
         _rope2 = GameObject.FindGameObjectWithTag("Rope2");
 
-        _avatars = GameObject.FindGameObjectsWithTag("Avatar");
+        if (GameManager.Instance.UsingVR)
+        {
+            _avatarHeads = GameObject.FindGameObjectsWithTag("HMDHead");
+        }
+        else
+        {
+            _avatarHeads = GameObject.FindGameObjectsWithTag("OptitrackHead");
+        }
         
+        _randomizeManager = GetComponent<RandomizeWords>();
 
-        _randomizeManager = GameObject.Find("RandomizeManager").GetComponent<RandomizeWords>();
+        _inGameRatingUI = new GameObject[2];
+        _inGameRatingUI[0] = GameObject.Find("RatingListInGame1");
+        _inGameRatingUI[1] = GameObject.Find("RatingListInGame2");
 
-        OnScreenRating = GameObject.FindGameObjectsWithTag("RatingOnScreen");
-        InGameRating = GameObject.FindGameObjectsWithTag("RatingInGame");
-        _ratingList = _randomizeManager.RatingList;
-
-        OnScreenRating[0].transform.parent.parent.gameObject.SetActive(false);
-        InGameRating[0].transform.parent.parent.gameObject.SetActive(false);
+        _inGameRatingUI[0].SetActive(false);
+        _inGameRatingUI[1].SetActive(false);
 
         // Only runs on master client
         // if (PhotonNetwork.isMasterClient)
@@ -87,7 +95,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
     void Update()
     {
         // Use "Space" key to control for next word, players take turn to guess word
-        // Use "R" key to start next group of words after change rope distance        
+        // Use "R" key to start next group of words after change rope distance  
+        // Use "alpha 1" key to switch to next time    
 
         if (HasStarted)
         {
@@ -100,9 +109,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
             {
                 StopGame();
                 AssignDistancesOnRopes();
-                ShowRatingUI();
+                // TODO: change to photonview.rpc call
+                RPC_ShowRatingUI(_inGameRatingUI,0);
             }
-            else if (Input.GetKeyDown(KeyCode.Space))
+            else if (Input.GetKeyDown(ChangeWordKey))
             {
                 if (_wordID < _wordList.Length)
                 {
@@ -118,35 +128,45 @@ public class SceneManager_Game : Photon.MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.R))
-            {               
+            if (Input.GetKeyDown(ReStartKey))
+            {       
+                // restart game        
                 StartGame();
-            }
-            else if(_avatars!=null)
+            } else if (Input.GetKeyDown(ChangeRatingQuestionKey))
             {
-                if (_avatars.Length != 2)
+                //TODO: change to photonview.rpc call
+                RPC_ShowRatingUI(_inGameRatingUI,1);
+                //photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,_inGameRatingUI,1);
+            }
+            else if (_avatarHeads != null)
+            {
+                if (_avatarHeads.Length != 2)
                 {
                     Debug.Log("Waiting for more avatars to join");
                     // TODO: change avatar to HMD avatar
-                    _avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    _avatarHeads = GameObject.FindGameObjectsWithTag("Avatar");
                 }
                 else
                 {
-                    foreach (GameObject avatar in _avatars)
+                    foreach (GameObject avatar in _avatarHeads)
                     {
                         if (avatar.transform.position.x > 0)
                         {
                             var distToRope = (avatar.transform.position.x - _rope2.transform.position.x).ToString("0.00");
-                            _board1.GetComponent<Text>().text = "Please adjust your position to the red rope. Your distance to the rope is: " + distToRope + "m";
+                            _board1.GetComponent<Text>().text =
+                                "Please adjust your position to the red rope. Your distance to the rope is: " +
+                                distToRope + "m";
                         }
                         else
                         {
                             var distToRope = (avatar.transform.position.x - _rope1.transform.position.x).ToString("0.00");
-                            _board2.GetComponent<Text>().text = "Please adjust your position to the red rope. Your distance to the rope is: " + distToRope + "m";
+                            _board2.GetComponent<Text>().text =
+                                "Please adjust your position to the red rope. Your distance to the rope is: " +
+                                distToRope + "m";
                         }
                     }
                 }
-            }               
+            }
         }
     }
 
@@ -155,10 +175,12 @@ public class SceneManager_Game : Photon.MonoBehaviour
     {
         // TODO: uncomment photonview line and recording manager line
         //photonView.RPC("RPC_StartGame", PhotonTargets.All);
-        RPC_StartGame();
-       // _recordingManager.StartRecording();
+        RPC_StartGame(_inGameRatingUI);
+        _recordingManager.StartRecording();
 
-        Debug.Log("20 Questions game Start!");
+        Debug.Log("2" +
+                  "0" +
+                  " Questions game Start!");
     }
 
     public void StopGame()
@@ -167,16 +189,19 @@ public class SceneManager_Game : Photon.MonoBehaviour
         //photonView.RPC("RPC_StopGame", PhotonTargets.All);
         RPC_StopGame();
 
-        //_recordingManager.StopRecording();
+        _recordingManager.StopRecording();
         Debug.Log("20 Questions game Stop!");
     }
 
     [PunRPC]
-    void RPC_StartGame()
+    void RPC_StartGame(GameObject[] ratingUI)
     {
         FindObjectOfType<SceneManager_Game>().HasStarted = true;
         FindObjectOfType<SceneManager_Game>().currentCountDown = FindObjectOfType<SceneManager_Game>().CountDownTime;
         GameObject.Find("StartButton").GetComponent<Button>().interactable = false;
+
+        ratingUI[0].SetActive(false);
+        ratingUI[1].SetActive(false);
     }
 
     [PunRPC]
@@ -194,11 +219,11 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     public void AssignDistancesOnRopes()
-    { 
-        
+    {       
         if (_distanceID < _distanceList.Length)
         {
-            float distance = float.Parse(_distanceList[_distanceID]) / 2f;
+            float distance = float.Parse(_distanceList[_distanceID]);
+            CurrentDistance = distance;
             RPC_AssignDistancesOnRopes(distance);
             //photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All);
             _distanceID++;
@@ -227,29 +252,17 @@ public class SceneManager_Game : Photon.MonoBehaviour
     [PunRPC]
     void RPC_AssignDistancesOnRopes(float dist)
     {
-        Debug.Log("Distance between players is: " + 2*dist);
+        Debug.Log("Distance between players is: " + dist);
       
-        _rope1.transform.position = new Vector3(-dist, 1f, 0);
-        _rope2.transform.position = new Vector3(dist, 1f, 0);      
+        _rope1.transform.position = new Vector3(-dist/2f, 1f, 0);
+        _rope2.transform.position = new Vector3(dist/2f, 1f, 0);      
     }
 
-    // TODO: add rpc, since the event is triggered by masterclient, only showed on avatar screen
-    void ShowRatingUI()
+    [PunRPC]
+    void RPC_ShowRatingUI(GameObject[] ratingUI, int index)
     {
-        _randomizeManager.RandomizeTexts(_ratingList);
-        for(int i=0; i<3; i++)
-        {
-            InGameRating[i].GetComponent<Text>().text = _ratingList[i];
-        }
-
-        foreach (GameObject rating in OnScreenRating) {
-            rating.GetComponent<SyncRatingOnScreen>().SyncOption();
-        }
-
-        OnScreenRating[0].transform.parent.parent.gameObject.SetActive(true);
-        InGameRating[0].transform.parent.parent.gameObject.SetActive(true);
+        ratingUI[index].gameObject.SetActive(true);
+        ratingUI[1-index].gameObject.SetActive(false);
     }
-
-    
 
 }

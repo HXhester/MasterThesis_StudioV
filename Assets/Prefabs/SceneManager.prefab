@@ -19,9 +19,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4978310789670806}
-  - component: {fileID: 114628513088436296}
-  - component: {fileID: 114592105601704112}
   - component: {fileID: 114868905566616462}
+  - component: {fileID: 114628513088436296}
+  - component: {fileID: 114453270009107022}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -42,7 +42,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114592105601704112
+--- !u!114 &114453270009107022
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -50,12 +50,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1863005258866180}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9990c63de139d624eb1c7aac259a5a97, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d83db2c1f4033b4dab2b610e7ab87b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsRecording: 0
-  RecordingFPS: 0
-  FrameOnAvatarChange: 0
+  WordList: []
+  DistanceList: []
+  RatingList: []
 --- !u!114 &114628513088436296
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -67,10 +67,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c89202c38662d488ebf4436566615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CurrentDistance: 0
   HasStarted: 0
   CountDownTime: 10
-  InGameRating: []
-  OnScreenRating: []
 --- !u!114 &114868905566616462
 MonoBehaviour:
   m_ObjectHideFlags: 1

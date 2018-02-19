@@ -5,10 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Photon.PunBehaviour
 {
-    public static GameManager Instance = null;
+    public static GameManager Instance;
 
     [HideInInspector]
-    public GameObject localAvatar = null;
+    public GameObject localAvatar;
+    public string DyadType;
+    public bool UsingVR;
 
     private void Awake()
     {
@@ -36,22 +38,6 @@ public class GameManager : Photon.PunBehaviour
 	void Start(){
 
 		DontDestroyOnLoad (gameObject);
-		//if (PhotonNetwork.playerName == "CameraManager") {
-
-		//	PhotonPlayer[] players = PhotonNetwork.playerList;
-		//    int numOfCameraManager = 0;
-		//	foreach (var p in players)
-		//	{
-		//	    if (p.NickName == "CameraManager")
-		//	    {
-		//	        numOfCameraManager += 1;                   
-		//	    }
-		//	}
-		//    if (numOfCameraManager > 1)
-		//    {
-  //              Debug.LogError("There existed a CameraManager, exit the room.");
-		//        leaveRoom();
-  //          }
 		    
 
   //          if (PhotonNetwork.isMasterClient)

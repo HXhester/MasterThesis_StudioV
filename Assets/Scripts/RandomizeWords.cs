@@ -15,8 +15,23 @@ public class RandomizeWords : MonoBehaviour
 	// Use this for initialization
 	void Awake () {
         // TODO: change wordlist
-		WordList = new string[]{ "Cat",  "Dog",  "Car"};
-        DistanceList = new string[] { "0.6", "1", "1.4", "2","2.8" };
+        // TODO: try out build files
+        if (Environment.CommandLine.Contains("Tutorial"))
+        {
+            GetComponent<SceneManager_Game>().CountDownTime = 15f;
+            WordList = new string[] { "CatT", "DogT", "CarT" };
+        }
+        else if (Environment.CommandLine.Contains("Experiment"))
+        {
+            GetComponent<SceneManager_Game>().CountDownTime = 180f;
+            WordList = new string[] { "CatE", "DogE", "CarE" };
+        }
+        else
+        {
+            WordList = new string[] { "CatEditor", "DogEditor", "CarEditor" };
+        }
+	    
+        DistanceList = new string[] { "0.4", "0.6", "1", "1.4","1.8" };
         RatingList = new string[] 
         {
         "This is an intimate distance for me. I keep this distance with close people, like parents, spouse etc.",

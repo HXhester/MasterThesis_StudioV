@@ -73,4 +73,5 @@ MonoBehaviour:
   - RPC_StopGame
   - RPC_StartRecord
   - RPC_StopRecord
+  - RPC_ShowRatingUI
   DisableAutoOpenWizard: 1

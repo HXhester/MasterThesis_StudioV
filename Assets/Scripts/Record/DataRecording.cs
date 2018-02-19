@@ -10,7 +10,7 @@ public class DataRecording : ThreadedJob
 
     public Vector3 Tobii_EyeDirection;
     public float InterPersonalDistance;
-    public StreamWriter sw_eye;
+    
 
     public int FrameCount;
     public int ThreadSleepTime;

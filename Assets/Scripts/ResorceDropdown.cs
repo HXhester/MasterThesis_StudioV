@@ -24,7 +24,7 @@ public class ResorceDropdown : MonoBehaviour {
 		} else {
 			files = Directory.GetFiles (Application.dataPath + pathFromAssets, "*.prefab");
 		}
-		Debug.Log ("Finding files");
+
 		string fileName;
 		if (!isScene) {
 			foreach (string s in files) {

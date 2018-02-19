@@ -35,23 +35,13 @@ public class ScaleAdjust : MonoBehaviour {
     {
         CameraRig = transform.parent.Find("[CameraRig]").transform;
         targetHeight = PlayerPrefs.GetFloat("ActorHeight") - headTipToEye;
+        float scale = targetHeight / originalHeight;
 
         if (_photonView.isMine) {
 
-            // Set both HMDBody and OptitrackBody size locally		
-            transform.localScale *= targetHeight / originalHeight;
-
-            // Set HMDHead size locally
-            HMDHead.localScale = Vector3.zero;
-
-            // Set both HMDBody and OptitrackBody size remotely
-            playerManager.SetScale (transform.localScale);
+            // Set both HMDBody and OptitrackBody size locally and remotely
+            playerManager.SetScale (scale);
             //		GetComponent<PhotonView> ().RPC ("RPC_SetScale", PhotonTargets.All, new object[]{playerManager.gameObject.name, transform.localScale});
-        }
-        else
-        {
-            //Set HMDhead size remotely
-            HMDHead.localScale *= targetHeight / originalHeight;
         }
     }
 
@@ -62,28 +52,8 @@ public class ScaleAdjust : MonoBehaviour {
 
 	    float scale = manualTargetHeight / originalHeight;
 
-        // Set body size locally	
-        transform.localScale *= scale;
-
-        // Set Vive area locally
-        CameraRig.localScale *= scale;
-
-        // Scale HeadToEyeVector on HMDHead locally
-	    transform.parent.Find("mixamorig: Head").GetComponent<SetHeadPos>().origHeadToEyeVector *= scale;
-
-        // Scale HeadToEyeVector on HMDHead remotely
-        // TODO...
-
-
-        playerManager.SetScale(transform.localScale);
+        playerManager.SetScale(scale);
         //		GetComponent<PhotonView> ().RPC ("RPC_SetScale", PhotonTargets.All, new object[]{playerManager.gameObject.name, transform.localScale});
     }
 
-    // Set Optitrack head scale
-    public void SetHeadScale(float scale)
-    {
-        Vector3 s = new Vector3(scale, scale, scale);
-		playerManager.OptitrackHead.localScale = s;
-		playerManager.SetHeadScale(s);
-    }
 }

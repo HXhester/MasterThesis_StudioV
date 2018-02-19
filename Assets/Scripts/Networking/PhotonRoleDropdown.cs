@@ -2,23 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Tobii.VR;
 
 namespace Com.MTGTech.MyGame{
 
 	[RequireComponent(typeof(Dropdown))]
 	public class PhotonRoleDropdown : MonoBehaviour {
 
-		#region Private Variables
-		// Store the PlayerPref key to avoid typos
 		Dropdown _dropdown;
 		public Dropdown sceneDropdown;
-
-		#endregion
 
 		public GameObject avatarName;
 		public GameObject skeletonName;
 		public GameObject actorHeight;
+	    public GameObject dyadType;
+	    public GameObject VRTogge;
 
 		private GameObject HMDPlacementCanvas;
 
@@ -42,19 +39,26 @@ namespace Com.MTGTech.MyGame{
 				actorHeight.SetActive (true);
 				skeletonName.SetActive (true);
 				sceneDropdown.gameObject.SetActive (false);
+                dyadType.SetActive(false);
+                VRTogge.SetActive(false);
 
-				HMDPlacementCanvas.SetActive (true);
-			} else if (_dropdown.options [_dropdown.value].text == "Master" || _dropdown.options [_dropdown.value].text == "CameraManager") {
+                if (HMDPlacementCanvas != null)
+                    HMDPlacementCanvas.SetActive (true);
+			} else if (_dropdown.options [_dropdown.value].text == "Master") {
 				avatarName.SetActive (false);
 				actorHeight.SetActive (false);
 				skeletonName.SetActive (false);
 				sceneDropdown.gameObject.SetActive (true);
-			} else {
+                dyadType.SetActive(true);
+                VRTogge.SetActive(true);
+            } else {
 				avatarName.SetActive (false);
 				actorHeight.SetActive (false);
 				skeletonName.SetActive (false);
 				sceneDropdown.gameObject.SetActive (false);
-			}
+                dyadType.SetActive(false);
+                VRTogge.SetActive(false);
+            }
 
 		}
 		#endregion

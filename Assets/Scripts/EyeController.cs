@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Tobii.VR;
+using Tobii.Research.Unity.CodeExamples;
 using System;
 using System.IO;
 
-// TODO: play with validity
+// TODO: Use gaze direction visualizer for screen recording of subject
 
 public class EyeController : Photon.MonoBehaviour
 {
@@ -19,86 +19,72 @@ public class EyeController : Photon.MonoBehaviour
 	public Transform r_eye_R;
 
 	private Vector3 _gazeDirection;
-	private float _leftEyeOpenness;
+    private Vector3 new_gazeDirection;
+    private float _leftEyeOpenness;
 	private float _rightEyeOpenness;
     
     private float _prevLeftEyeOpenness;
 	private float _prevRightEyeOpenness;
 	static float t_EyeL = 0.0f;
 	static float t_EyeR = 0.0f;
+    public float EyeMoveLerpSpeed = 20f;
 
-	private Vector3 new_gazeDirection;
+    private SubscribingToHMDGazeData _subscribingGazeData;
 
-	// Recording of eye gaze direction data
-	private StreamWriter sw;
-	private String filename;
-
-    public DataRecording NewRecord;
-    public bool isRecording = false;
-
-	// Use this for initialization
-	void Start () {
-	    //TODO: uncomment all if(photonview.isMine)
-        //if (photonView.isMine)
+    // Use this for initialization
+    void Start () {
+	    
+        if (photonView.isMine)
 	    {
-
-            NewRecord = new DataRecording();
-
-
             Camera eyeCam = transform.Find("[CameraRig]").Find("Camera (eye)").GetComponent<Camera>();
-	        TobiiVR_Host.Instance.Init(eyeCam);
-	        TobiiVR_Host.Instance.ValidTrackerData += OnValidData;
 
-	        _prevLeftEyeOpenness = _leftEyeOpenness;
+            TobiiPro_Host.Instance.SetCameraUsedToRender(eyeCam);
+            _subscribingGazeData = SubscribingToHMDGazeData.SubscribingInstance;
+
+            _prevLeftEyeOpenness = _leftEyeOpenness;
 	        _prevRightEyeOpenness = _rightEyeOpenness;
-
 	    }
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
 		if (photonView.isMine) {
-			if (isRecording)
-			{
-			    NewRecord.Tobii_EyeDirection = _gazeDirection;
-			}
-			
-			eye_L.forward = Vector3.Lerp (eye_L.forward, _gazeDirection, Time.deltaTime * lerpRate);
-			eye_R.forward = eye_L.forward;
 
-		    r_eye_L.forward = Vector3.Lerp(r_eye_L.forward, _gazeDirection, Time.deltaTime * lerpRate);
-		    r_eye_R.forward = r_eye_L.forward;
+            // Sync data to another thread for recording
+            _gazeDirection = _subscribingGazeData.GazeDirection;
+            _leftEyeOpenness = _subscribingGazeData.LeftEyeOpenness;
+            _rightEyeOpenness = _subscribingGazeData.RightEyeOpenness;
+
+            // Set eye gaze direction
+            if (TobiiPro_Host.EyeTrackerInstance != null && !TobiiPro_Host.isEyeTrackerConnected)
+            {
+                eye_L.transform.localRotation = Quaternion.identity;
+                eye_R.forward = eye_L.forward;
+
+                r_eye_L.transform.localRotation = Quaternion.identity;
+                r_eye_R.forward = r_eye_L.forward;
+
+                _gazeDirection = eye_L.forward;
+            }
+            else
+            {
+                // global rotation
+                eye_L.forward = Vector3.Lerp(eye_L.forward, _gazeDirection, Time.deltaTime * EyeMoveLerpSpeed);
+                eye_R.forward = eye_L.forward;
+
+                r_eye_L.forward = Vector3.Lerp(r_eye_L.forward, _gazeDirection, Time.deltaTime * EyeMoveLerpSpeed);
+                r_eye_R.forward = r_eye_L.forward;
+            }
         } else {
-            
-		    eye_L.forward = Vector3.Lerp(eye_L.forward, new_gazeDirection, Time.deltaTime * lerpRate);
-		    eye_R.forward = eye_L.forward;
 
-            r_eye_L.forward = Vector3.Lerp (r_eye_L.forward, new_gazeDirection, Time.deltaTime * lerpRate);
-			r_eye_R.forward = r_eye_L.forward;
-		}
+            eye_L.forward = Vector3.Lerp(eye_L.forward, new_gazeDirection, Time.deltaTime * EyeMoveLerpSpeed);
+            eye_R.forward = eye_L.forward;
+
+            r_eye_L.forward = Vector3.Lerp(r_eye_L.forward, new_gazeDirection, Time.deltaTime * EyeMoveLerpSpeed);
+            r_eye_R.forward = r_eye_L.forward;
+        }
 
 		UpdateBlendShapes (transform);
-	}
-
-	private void OnValidData(object sender, EventArgs e)
-	{
-		if (photonView.isMine) {
-
-
-			Quaternion rotation = Quaternion.LookRotation(TobiiVR_Host.Instance.LocalGazeDirection);
-			Vector3 eyeDirection = rotation.eulerAngles;
-
-			var x = Mathf.Clamp (eyeDirection.x, -20f, 20f);
-			var y = Mathf.Clamp (eyeDirection.y, -10f, 10f);
-			var z = eyeDirection.z;
-
-			//_gazeDirection = new Vector3 (x, y, z);
-	
-			_gazeDirection = TobiiVR_Host.Instance.GazeDirection;
-			_leftEyeOpenness = TobiiVR_Host.Instance.LatestData.Left.EyeOpenness;
-			_rightEyeOpenness = TobiiVR_Host.Instance.LatestData.Right.EyeOpenness;
-		}
-
 	}
 
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -122,7 +108,6 @@ public class EyeController : Photon.MonoBehaviour
 		if (renderer != null)
 		{
 			var mesh = renderer.sharedMesh;
-
 
 			for (int j = 0; j < mesh.blendShapeCount; j++)
 			{
@@ -148,31 +133,12 @@ public class EyeController : Photon.MonoBehaviour
 						_prevRightEyeOpenness = _rightEyeOpenness;
 						t_EyeR = 0.0f;
 					}
-				    
-
 				}
 			}
-
 		}
 		foreach(Transform children in gameObject)
 		{
 			UpdateBlendShapes(children);
 		}
 	}
-
-	// Destroy eyetracking onValidData event
-	void OnDisable(){
-		TobiiVR_Host.Instance.ValidTrackerData -= OnValidData;
-	}
-
-	// Close the recording file when game quit
-	void OnApplicationQuit(){
-		if (sw != null) {
-			sw.Close ();
-		}
-
-	}
-
-
-
 }

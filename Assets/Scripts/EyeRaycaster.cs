@@ -2,27 +2,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Tobii.VR;
+using Tobii.Research.Unity.CodeExamples;
 
 public class EyeRaycaster : MonoBehaviour {
 
-	public float m_RayLength;
-	public RaycastHit eyeHit;
+    //public float m_RayLength;
+    //public RaycastHit eyeHit;
+    public KeyCode ToggleVisualizerKey = KeyCode.F12;
 
-	protected void OnEnable(){
-		TobiiVR_Host.Instance.ValidTrackerData += OnValidData;
-	}
+    private bool rayToggler;
 
-	protected void OnDisable(){
-		TobiiVR_Host.Instance.ValidTrackerData -= OnValidData;
-	}
+    void Update()
+    {
+        //var ray = new Ray(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection);
+        //RaycastHit info;
+        //Physics.Raycast(ray, out info, m_RayLength);
+        //eyeHit = info;
+        if (Input.GetKeyDown(ToggleVisualizerKey))
+        {
+            ToggleRay();
+        }
 
-	protected void OnValidData(object sender, EventArgs e)
-	{
-		var ray = new Ray(transform.position, TobiiVR_Host.Instance.GazeDirection);
+        if (rayToggler)
+        {
+            Debug.DrawRay(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection, Color.blue);
+        }        
+    }
 
-		RaycastHit info;
-		Physics.Raycast (ray, out info, m_RayLength);
-		eyeHit = info;
-	}
+    void ToggleRay()
+    {
+        rayToggler = !rayToggler;
+    }
+
 }

@@ -6,7 +6,6 @@ TagManager:
   tags:
   - Avatar
   - optitrackClient
-  - Head
   - CameraManager
   - CameraClient
   - VirtualCamera
@@ -20,8 +19,12 @@ TagManager:
   - Board1
   - Board2
   - RatingOnScreen
-  - RatingInGame
   - Option
+  - RatingInGame
+  - EyeMesh
+  - Head
+  - HMDHead
+  - OptitrackHead
   layers:
   - Default
   - TransparentFX
