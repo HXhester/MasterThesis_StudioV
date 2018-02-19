@@ -183,9 +183,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         RPC_StartGame(_inGameRatingUI);
         _recordingManager.StartRecording();
 
-        Debug.Log("2" +
-                  "0" +
-                  " Questions game Start!");
+        Debug.Log("20 Questions game Start!");
     }
 
     public void StopGame()

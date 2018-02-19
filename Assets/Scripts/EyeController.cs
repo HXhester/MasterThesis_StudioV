@@ -36,7 +36,7 @@ public class EyeController : Photon.MonoBehaviour
 	    
         if (photonView.isMine)
 	    {
-            Camera eyeCam = transform.Find("[CameraRig]").Find("Camera (eye)").GetComponent<Camera>();
+            Camera eyeCam = GetComponent<PlayerManager>().Camera.GetComponent<Camera>();
 
             TobiiPro_Host.Instance.SetCameraUsedToRender(eyeCam);
             _subscribingGazeData = SubscribingToHMDGazeData.SubscribingInstance;
@@ -51,10 +51,13 @@ public class EyeController : Photon.MonoBehaviour
 		if (photonView.isMine) {
 
             // Sync data to another thread for recording
-            _gazeDirection = _subscribingGazeData.GazeDirection;
-            _leftEyeOpenness = _subscribingGazeData.LeftEyeOpenness;
-            _rightEyeOpenness = _subscribingGazeData.RightEyeOpenness;
-
+		    if (_subscribingGazeData != null)
+		    {
+                _gazeDirection = _subscribingGazeData.GazeDirection;
+                _leftEyeOpenness = _subscribingGazeData.LeftEyeOpenness;
+                _rightEyeOpenness = _subscribingGazeData.RightEyeOpenness;
+            }
+		   
             // Set eye gaze direction
             if (TobiiPro_Host.EyeTrackerInstance != null && !TobiiPro_Host.isEyeTrackerConnected)
             {

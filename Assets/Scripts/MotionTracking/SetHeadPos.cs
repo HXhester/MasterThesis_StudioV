@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SetHeadPos : Photon.MonoBehaviour {
-	public Transform CameraEye;
+	private Transform _cameraEye;
 //	public Transform remoteCameraEye;
 	public float LerpRate = 42.0f;
 
@@ -19,24 +19,29 @@ public class SetHeadPos : Photon.MonoBehaviour {
 	    origHeadScale = transform.localScale;
 
 	}
-	void Start () {
-		origHeadToEyeVector = - transform.position;
+	void Start ()
+	{
+	    _cameraEye = transform.parent.GetComponent<PlayerManager>().Camera.transform;
+        origHeadToEyeVector = - transform.position;
 		headToEyeVector = origHeadToEyeVector;
 		origRotation = transform.localEulerAngles;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        if(_cameraEye==null)
+            return;
+	    
 		Vector3 newPos;
-		Vector3 rot = CameraEye.localEulerAngles;
+		Vector3 rot = _cameraEye.localEulerAngles;
 		headToEyeVector = Quaternion.Euler (rot.x, rot.y, rot.z) * headToEyeVector;
 
-        newPos = CameraEye.position - headToEyeVector;
+        newPos = _cameraEye.position - headToEyeVector;
 
         transform.position = Vector3.Lerp(transform.position, newPos, Time.deltaTime * LerpRate);
 
 		transform.localEulerAngles = origRotation;
-		transform.Rotate (CameraEye.localEulerAngles);
+		transform.Rotate (_cameraEye.localEulerAngles);
 
 	    headToEyeVector = origHeadToEyeVector;
 

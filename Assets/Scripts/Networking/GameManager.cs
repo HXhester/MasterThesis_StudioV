@@ -103,7 +103,7 @@ public class GameManager : Photon.PunBehaviour
 			if (player.tag == "Avatar") {
 				SetParent (player);
 				if (player.GetPhotonView ().isMine) {
-					var listener = player.GetComponent<PlayerManager>()._camera.GetComponent<AudioListener> ();
+					var listener = player.GetComponent<PlayerManager>().Camera.GetComponent<AudioListener> ();
 					if (listener != null) {
 						listener.enabled = true;
 					}
@@ -132,7 +132,7 @@ public class GameManager : Photon.PunBehaviour
 		if (player.tag == "Avatar") {
 			SetParent (player);
 			if (player.GetPhotonView ().isMine) {
-				var listener = player.GetComponent<PlayerManager>()._camera.GetComponent<AudioListener> ();
+				var listener = player.GetComponent<PlayerManager>().Camera.GetComponent<AudioListener> ();
 				if (listener != null) {
 					listener.enabled = true;
 				}

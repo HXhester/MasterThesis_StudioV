@@ -8,12 +8,11 @@ public class PlayerManager : Photon.PunBehaviour
 {
 
     private Transform expressionController;
-
-    public GameObject _camera;
+    [HideInInspector]
+    public GameObject Camera;
 
     [Header("Local")]
     public OptitrackSkeletonAnimator localOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
-    public AudioListener listener;
 
     [Header("Remote")]
     public OptitrackSkeletonAnimator remoteOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
@@ -28,10 +27,18 @@ public class PlayerManager : Photon.PunBehaviour
         {
 			localOptitrackAnimator.gameObject.SetActive(true);
 			remoteOptitrackAnimator.gameObject.SetActive(false);
-            _camera.GetComponent<SteamVR_Camera>().enabled = true;
-            _camera.GetComponent<Camera>().enabled = true;
-            _camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
-            listener.enabled = true;
+            try
+            {
+                Camera = GameObject.Find("[CameraRig]").transform.Find("Camera (eye)").gameObject;
+            }
+            catch
+            {
+                Debug.LogWarning("PlayerManager.cs: No HMD detected");
+            }
+
+            Camera.GetComponent<SteamVR_Camera>().enabled = true;
+            Camera.GetComponent<Camera>().enabled = true;
+            Camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
 
             localOptitrackAnimator.enabled = false;
             remoteOptitrackAnimator.enabled = false;
@@ -140,7 +147,8 @@ public class PlayerManager : Photon.PunBehaviour
 
     public void SetScale(float scale)
     {
-        photonView.RPC("RPC_SetScale", PhotonTargets.AllBuffered, new object[] {gameObject.name, scale});
+        //TODO: uncomment this
+        //photonView.RPC("RPC_SetScale", PhotonTargets.AllBuffered, new object[] {gameObject.name, scale});
     }
 
     [PunRPC]
@@ -149,6 +157,6 @@ public class PlayerManager : Photon.PunBehaviour
         Debug.Log("Setting scale of " + playerName + " on all clients");
         GameObject.Find(playerName).transform.localScale *= scale;
         // Keep world scale of camerarig as 1,1,1
-        GameObject.Find(playerName).transform.Find("[CameraRig]").transform.localScale /= scale;
+        GameObject.Find("[CameraRig]").transform.localScale /= scale;
     }
 }

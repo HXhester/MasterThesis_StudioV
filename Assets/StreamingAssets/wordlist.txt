@@ -4,8 +4,7 @@ Sports:badminton,hockey,bowling,tennis,baseball,boxing,swimming,golf
 Food:French fries,spaghetti,sushi,steak,meat balls,sandwich
 Drinks:yoghurt,smoothie,tea,soda,cider,beer
 Furniture:lamp,oven,book shelf,sofa,carpet,bath tub,arm chair
-Clothes:sneaker,pajama,necklace,hoodie,jeans
-Donald duck,Harry potter,Lord of the rings,tom and jerry,la la land
-Facebook,Tinder,Snapchat,Tesla,Ben&Jerry
-violin,trumpet,harp,organ,drum
-USB,powerbank,router,speaker,balloon
+Clothes:sneaker,pajama,skirt,hoodie,jeans,belt,sock
+Film/Series:Donald Duck,Harry Potter,Lord of the Rings,Tom and Jerry,Game of Thrones,Friends,Black Mirror
+Brands:Facebook,Snapchat,Tesl,KFC,Coca-Cola,Max,Microsoft,Disney,Dior,IKEA
+Instruments:violin,trumpet,guitar,organ,drum

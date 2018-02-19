@@ -8,7 +8,7 @@ public class ScaleAdjust : MonoBehaviour {
 	public Transform eyeLevel;
 	public PlayerManager playerManager;
 
-    private Transform CameraRig;
+    //private Transform CameraRig;
 
     private float targetHeight;    			// Height of actor
     private float originalHeight;  			// Original height of avatar
@@ -22,7 +22,7 @@ public class ScaleAdjust : MonoBehaviour {
     {
         originalHeight = eyeLevel.position.y;
 
-        HMDHead = transform.parent.Find("mixamorig:Head").transform;
+        HMDHead = transform.Find("mixamorig:Head").transform;
 
         if (_photonView == null)
         {
@@ -33,7 +33,7 @@ public class ScaleAdjust : MonoBehaviour {
 
     void Start()
     {
-        CameraRig = transform.parent.Find("[CameraRig]").transform;
+        //CameraRig = GameObject.Find("[CameraRig]").transform;
         targetHeight = PlayerPrefs.GetFloat("ActorHeight") - headTipToEye;
         float scale = targetHeight / originalHeight;
 
@@ -41,13 +41,13 @@ public class ScaleAdjust : MonoBehaviour {
 
             // Set both HMDBody and OptitrackBody size locally and remotely
             playerManager.SetScale (scale);
-            //		GetComponent<PhotonView> ().RPC ("RPC_SetScale", PhotonTargets.All, new object[]{playerManager.gameObject.name, transform.localScale});
+                
         }
     }
 
 	public void SetHeight(){
 		transform.localScale = Vector3.one;
-	    CameraRig.localScale = Vector3.one;
+	    //CameraRig.localScale = Vector3.one;
         manualTargetHeight = manualTargetHeight - headTipToEye;
 
 	    float scale = manualTargetHeight / originalHeight;
