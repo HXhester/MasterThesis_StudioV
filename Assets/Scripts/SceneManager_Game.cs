@@ -231,7 +231,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             float distance = float.Parse(_distanceList[_distanceID]);
             CurrentDistance = distance;
             //RPC_AssignDistancesOnRopes(distance);
-            photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All);
+            photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All,distance);
             _distanceID++;
         }else
         {
