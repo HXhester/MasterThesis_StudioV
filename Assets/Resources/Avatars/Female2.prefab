@@ -1395,7 +1395,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4811515887492000}
   - component: {fileID: 95998040854317958}
-  - component: {fileID: 114855915595755608}
+  - component: {fileID: 114010741644654252}
   - component: {fileID: 114596655437172172}
   m_Layer: 9
   m_Name: HMD_Female2
@@ -2125,7 +2125,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4148156338249706}
   - component: {fileID: 95815377977222796}
-  - component: {fileID: 114554765727839604}
+  - component: {fileID: 114358714743406688}
   m_Layer: 10
   m_Name: Optitrack_Female2
   m_TagString: Untagged
@@ -4680,6 +4680,20 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114010741644654252
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1520613599176942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fcd8d00e3047d444bd2120ae0abc4cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StreamingClient: {fileID: 0}
+  SkeletonAssetName: Skeleton1
+  DestinationAvatar: {fileID: 9000000, guid: 973c01419e21ffc44bc03656d69b7daf, type: 3}
 --- !u!114 &114326343724098714
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4707,6 +4721,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LerpRate: 42
   origHeadToEyeVector: {x: 0, y: 0, z: 0}
+--- !u!114 &114358714743406688
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1858815094526494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fcd8d00e3047d444bd2120ae0abc4cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StreamingClient: {fileID: 0}
+  SkeletonAssetName: Skeleton1
+  DestinationAvatar: {fileID: 9000000, guid: 973c01419e21ffc44bc03656d69b7daf, type: 3}
 --- !u!114 &114405842033138792
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4759,20 +4787,6 @@ MonoBehaviour:
   - Midmouth_R
   - CheekPuff
   isRecording: 0
---- !u!114 &114554765727839604
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1858815094526494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6226842a13d56fc4b9f6ffc41f7ef0ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamingClient: {fileID: 0}
-  SkeletonAssetName: Skeleton1
-  DestinationAvatar: {fileID: 9000000, guid: 973c01419e21ffc44bc03656d69b7daf, type: 3}
 --- !u!114 &114596655437172172
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4787,20 +4801,6 @@ MonoBehaviour:
   headLower: {fileID: 4979255252586384}
   neckUpper: {fileID: 4584142386549882}
   speed: 40
---- !u!114 &114855915595755608
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1520613599176942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6226842a13d56fc4b9f6ffc41f7ef0ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamingClient: {fileID: 0}
-  SkeletonAssetName: Skeleton1
-  DestinationAvatar: {fileID: 9000000, guid: 973c01419e21ffc44bc03656d69b7daf, type: 3}
 --- !u!114 &114927767744480444
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4841,8 +4841,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Camera: {fileID: 0}
-  localOptitrackAnimator: {fileID: 114855915595755608}
-  remoteOptitrackAnimator: {fileID: 114554765727839604}
+  localOptitrackAnimator: {fileID: 114010741644654252}
+  remoteOptitrackAnimator: {fileID: 0}
   OptitrackHead: {fileID: 4337586498124588}
 --- !u!137 &137087318536548626
 SkinnedMeshRenderer:

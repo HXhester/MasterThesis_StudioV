@@ -732,7 +732,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4891987104006552}
   - component: {fileID: 95289376570352526}
-  - component: {fileID: 114947847617054364}
+  - component: {fileID: 114123694453376576}
   m_Layer: 10
   m_Name: Optitrack_Male2
   m_TagString: Untagged
@@ -2112,8 +2112,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4097535896884842}
   - component: {fileID: 95495936048637222}
-  - component: {fileID: 114273469746303198}
   - component: {fileID: 114219900448693998}
+  - component: {fileID: 114733639710365844}
   m_Layer: 9
   m_Name: HMD_Male2
   m_TagString: Untagged
@@ -4697,6 +4697,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LerpRate: 42
   origHeadToEyeVector: {x: 0, y: 0, z: 0}
+--- !u!114 &114123694453376576
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1277871935735518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fcd8d00e3047d444bd2120ae0abc4cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StreamingClient: {fileID: 0}
+  SkeletonAssetName: Skeleton1
+  DestinationAvatar: {fileID: 9000000, guid: 36f0a704de56a044d9a3b25a4e67b0f5, type: 3}
 --- !u!114 &114163829271174630
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4791,20 +4805,6 @@ MonoBehaviour:
   instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
---- !u!114 &114273469746303198
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1880733861249324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6226842a13d56fc4b9f6ffc41f7ef0ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamingClient: {fileID: 0}
-  SkeletonAssetName: Skeleton1
-  DestinationAvatar: {fileID: 9000000, guid: 36f0a704de56a044d9a3b25a4e67b0f5, type: 3}
 --- !u!114 &114534697401674370
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4817,8 +4817,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Camera: {fileID: 0}
-  localOptitrackAnimator: {fileID: 114273469746303198}
-  remoteOptitrackAnimator: {fileID: 114947847617054364}
+  localOptitrackAnimator: {fileID: 114733639710365844}
+  remoteOptitrackAnimator: {fileID: 114123694453376576}
   OptitrackHead: {fileID: 4275793903582572}
 --- !u!114 &114555634024265228
 MonoBehaviour:
@@ -4834,15 +4834,15 @@ MonoBehaviour:
   eyeLevel: {fileID: 4570552084643958}
   playerManager: {fileID: 114534697401674370}
   manualTargetHeight: 0
---- !u!114 &114947847617054364
+--- !u!114 &114733639710365844
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1277871935735518}
+  m_GameObject: {fileID: 1880733861249324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6226842a13d56fc4b9f6ffc41f7ef0ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fcd8d00e3047d444bd2120ae0abc4cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   StreamingClient: {fileID: 0}

@@ -74,4 +74,6 @@ MonoBehaviour:
   - RPC_StartRecord
   - RPC_StopRecord
   - RPC_ShowRatingUI
+  - RPC_TriggerUpdateDefinitions
+  - RPC_UpdateDefinitions
   DisableAutoOpenWizard: 1
