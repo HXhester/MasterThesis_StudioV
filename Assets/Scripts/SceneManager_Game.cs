@@ -76,7 +76,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 _distanceList = new string[_randomizeManager.DistanceList.Length];
                 _categoryWordDict = new Dictionary<string, string>();
 
-                _wordList = _randomizeManager.WordList;
+                _randomizeManager.WordList.CopyTo(_wordList,0);
 	            _randomizeManager.DistanceList.CopyTo(_distanceList, 0);
                 
                 // Randomize the listf
