@@ -147,8 +147,7 @@ public class PlayerManager : Photon.PunBehaviour
 
     public void SetScale(float scale)
     {
-        //TODO: uncomment this
-        //photonView.RPC("RPC_SetScale", PhotonTargets.AllBuffered, new object[] {gameObject.name, scale});
+        photonView.RPC("RPC_SetScale", PhotonTargets.AllBuffered, new object[] {gameObject.name, scale});
     }
 
     [PunRPC]

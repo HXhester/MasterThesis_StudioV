@@ -64,8 +64,14 @@ namespace Com.MTGTech.MyGame{
 			PhotonNetwork.LoadLevel (sceneToLoadText.text);
 		    GameManager.Instance.DyadType = DyadTypeText.text;
 		    GameManager.Instance.UsingVR = isUsingVR.isOn;
-
-		}
+            if (!string.IsNullOrEmpty(skeletonName.text)) {
+                PlayerPrefs.SetString("SkeletonName", skeletonName.text);
+            }
+            if (!string.IsNullOrEmpty(actorHeight.text))
+            {
+                PlayerPrefs.SetFloat("ActorHeight", float.Parse(actorHeight.text));
+            }
+        }
         #endregion
 
 	    void ManageMasterOnJoin()
