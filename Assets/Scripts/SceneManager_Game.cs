@@ -145,8 +145,9 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 if (_avatarHeads.Length != 2)
                 {
                     Debug.Log("Waiting for more avatars to join");
-                    // TODO: change avatar to HMD avatar
-                    _avatarHeads = GameObject.FindGameObjectsWithTag("Avatar");
+                    var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
+                    _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;
                 }
                 else
                 {

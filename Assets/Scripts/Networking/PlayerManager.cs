@@ -48,6 +48,10 @@ public class PlayerManager : Photon.PunBehaviour
 
             //Not necessary if remoteavatar is already set to layer Remote in the prefab..
             SetLayerTo(this, "Remote");
+
+            var overviewcam = GameObject.FindGameObjectWithTag("CameraClientToPickup");
+            if (overviewcam != null)
+                overviewcam.GetComponent<Camera>().enabled = false;
         }
         else
         {
