@@ -3,14 +3,17 @@
 //======================================================================================================
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 using NaturalPoint;
 using NaturalPoint.NatNetLib;
 using System.Net.Sockets;
-
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
 
 /// <summary>Skeleton naming conventions supported by OptiTrack Motive.</summary>
 public enum OptitrackBoneNameConvention
@@ -20,23 +23,105 @@ public enum OptitrackBoneNameConvention
     BVH,
 }
 
+[System.Serializable]
+public struct Vector3Serializer{
+	
 
-/// <summary>Describes the position and orientation of a streamed tracked object.</summary>
-public class OptitrackPose
-{
-    public Vector3 Position;
-    public Quaternion Orientation;
+	public float x;
+	public float y;
+	public float z;
+
+	public Vector3Serializer(float x, float y, float z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public void Fill(Vector3 v3){
+		x = v3.x;
+		y = v3.y;
+		z = v3.z;
+	}
+	public Vector3 V3{get{ return new Vector3 (x, y, z);} set{ Fill (value);}}
+}
+[System.Serializable]
+public struct QuaternionSerializer{
+	public float x;
+	public float y;
+	public float z;
+	public float w;
+
+	public QuaternionSerializer(float x, float y, float z, float w){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+	}
+
+	public void Fill(Quaternion q){
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		w = q.w;
+	}
+	public Quaternion Q{get{ return new Quaternion (x, y, z, w);} set{ Fill (value);}}
 }
 
+/// <summary>Describes the position and orientation of a streamed tracked object.</summary>
+[System.Serializable]
+public class OptitrackPose
+{
+	private Vector3Serializer interpolatedPosition;
+	public Vector3Serializer previousUpdatedPositon;
+	private Vector3Serializer lastUpdatedPositon;
+	private float lerpTime;
 
+//	public OptitrackPose(Vector3Serializer previousUpdatedPositon, QuaternionSerializer previousUpdatedOrientation){
+//		this.previousUpdatedPositon = previousUpdatedPositon;
+//		this.previousUpdatedOrientation = previousUpdatedOrientation;
+//	}
+	public void ResetTime(){
+		lerpTime = Time.time;
+	}
+
+	public Vector3Serializer Position{
+		get{
+			interpolatedPosition.V3 = Vector3.Lerp(interpolatedPosition.V3, lastUpdatedPositon.V3, Time.deltaTime*10);
+//			Debug.Log (((Time.time - lerpTime)*10));
+//			Debug.Log ("lastUpdatedPositon: " + lastUpdatedPositon.V3.ToString("F4") + "previousUpdatedPositon: " + previousUpdatedPositon.V3.ToString("F4") + "interpolatedPosition: " + interpolatedPosition.V3.ToString("F4"));
+			return interpolatedPosition;
+		}set{
+			previousUpdatedPositon = lastUpdatedPositon;
+//			Debug.Log ("previousUpdatedPositon: " + previousUpdatedPositon.V3 + "lastUpdatedPosition: " + lastUpdatedPositon.V3 + "value: " + value.V3);
+			lastUpdatedPositon = value;
+//			Debug.Log ("---previousUpdatedPositon: " + previousUpdatedPositon.V3 + "lastUpdatedPosition: " + lastUpdatedPositon.V3 + "value: " + value.V3);
+		}
+	}
+
+	private QuaternionSerializer interpolatedOrientation;
+	public QuaternionSerializer previousUpdatedOrientation;
+	private QuaternionSerializer lastUpdatedOrientation;
+	public QuaternionSerializer Orientation{
+		get{ 
+			interpolatedOrientation.Q = Quaternion.Lerp (interpolatedOrientation.Q, lastUpdatedOrientation.Q, Time.deltaTime*10);
+			return interpolatedOrientation;
+		}set{ 
+			previousUpdatedOrientation = lastUpdatedOrientation;
+			lastUpdatedOrientation = value;
+		}
+	}
+}
+
+[System.Serializable]
 public struct OptitrackMarkerState
 {
-    public Vector3 Position;
+	public Vector3Serializer Position;
     public float Size;
 }
 
 
 /// <summary>Represents the state of a streamed rigid body at an instant in time.</summary>
+[System.Serializable]
 public class OptitrackRigidBodyState
 {
     public OptitrackHiResTimer.Timestamp DeliveryTimestamp;
@@ -46,16 +131,29 @@ public class OptitrackRigidBodyState
 
 
 /// <summary>Represents the state of a streamed skeleton at an instant in time.</summary>
+[System.Serializable]
 public class OptitrackSkeletonState
 {
     /// <summary>Maps from OptiTrack bone IDs to their corresponding bone poses.</summary>
     public Dictionary<Int32, OptitrackPose> BonePoses;
 }
+[System.Serializable]
+public class OptitrackRigidBodyDefinition {
+    [System.Serializable]
+    public class MarkerDefinition {
+        public Vector3Serializer Position;
+        public Int32 RequiredLabel;
+    }
 
-
+    public Int32 Id;
+    public string Name;
+    public List<MarkerDefinition> Markers;
+}
 /// <summary>Describes the hierarchy and neutral pose of a streamed skeleton.</summary>
+[System.Serializable]
 public class OptitrackSkeletonDefinition
 {
+	[System.Serializable]
     public class BoneDefinition
     {
         /// <summary>The ID of this bone within this skeleton.</summary>
@@ -71,7 +169,7 @@ public class OptitrackSkeletonDefinition
         /// This bone's position offset from its parent in the skeleton's neutral pose.
         /// (The neutral orientation is always <see cref="Quaternion.identity"/>.)
         /// </summary>
-        public Vector3 Offset;
+        public Vector3Serializer Offset;
     }
 
     /// <summary>Skeleton ID. Used as an argument to <see cref="OptitrackStreamingClient.GetLatestSkeletonState"/>.</summary>
@@ -84,9 +182,10 @@ public class OptitrackSkeletonDefinition
     public List<BoneDefinition> Bones;
 }
 
-
+[System.Serializable]
 public static class OptitrackHiResTimer
 {
+	[System.Serializable]
     public struct Timestamp
     {
         internal Int64 m_ticks;
@@ -118,12 +217,13 @@ public static class OptitrackHiResTimer
 /// <summary>
 /// Connects to a NatNet streaming server and makes the data available in lightweight Unity-friendly representations.
 /// </summary>
-public class OptitrackStreamingClient : MonoBehaviour
+public class OptitrackStreamingClient : Photon.MonoBehaviour
 {
     public enum ClientConnectionType
     {
         Multicast,
-        Unicast
+        Unicast,
+		Photon
     }
 
 
@@ -142,21 +242,44 @@ public class OptitrackStreamingClient : MonoBehaviour
 
     private NatNetClient m_client;
     private NatNetClient.DataDescriptions m_dataDescs;
-    private List<OptitrackSkeletonDefinition> m_skeletonDefinitions = new List<OptitrackSkeletonDefinition>();
+
+    private List<OptitrackRigidBodyDefinition> m_rigidBodyDefinitions = new List<OptitrackRigidBodyDefinition>();
+    private List<OptitrackRigidBodyDefinition> m_photonisedRigidBodyDefinitions = new List<OptitrackRigidBodyDefinition>();
+    public List<OptitrackSkeletonDefinition> m_skeletonDefinitions = new List<OptitrackSkeletonDefinition>();
+    public List<OptitrackSkeletonDefinition> m_photonisedSkeletonDefinitions = new List<OptitrackSkeletonDefinition>();
 
     /// <summary>Maps from a streamed rigid body's ID to its most recent available pose data.</summary>
-    private Dictionary<Int32, OptitrackRigidBodyState> m_latestRigidBodyStates = new Dictionary<Int32, OptitrackRigidBodyState>();
+	private Dictionary<Int32, OptitrackRigidBodyState> m_latestRigidBodyStates = new Dictionary<Int32, OptitrackRigidBodyState>();
+	private Dictionary<Int32, OptitrackRigidBodyState> m_photonisedLatestRigidBodyStates = new Dictionary<Int32, OptitrackRigidBodyState>();
+//    private Dictionary<Int32, OptitrackRigidBodyState> m_previousPhotonisedLatestRigidBodyStates = new Dictionary<Int32, OptitrackRigidBodyState>();
 
     /// <summary>Maps from a streamed skeleton's ID to its most recent available pose data.</summary>
-    private Dictionary<Int32, OptitrackSkeletonState> m_latestSkeletonStates = new Dictionary<Int32, OptitrackSkeletonState>();
+	private Dictionary<Int32, OptitrackSkeletonState> m_latestSkeletonStates = new Dictionary<Int32, OptitrackSkeletonState>();
+	public Dictionary<Int32, OptitrackSkeletonState> m_photonisedLatestSkeletonStates = new Dictionary<Int32, OptitrackSkeletonState>();
+//    public Dictionary<Int32, OptitrackSkeletonState> m_previousPhotonisedLatestSkeletonStates = new Dictionary<Int32, OptitrackSkeletonState>();
 
     /// <summary>
     /// Lock held during access to fields which are potentially modified by <see cref="OnNatNetFrameReceived"/> (which
     /// executes on a separate thread). Note while the lock is held, any frame updates received are simply dropped.
     /// </summary>
     private object m_frameDataUpdateLock = new object();
+
+	private bool getStreamThroughPhoton = false;
+
     #endregion Private fields
 
+
+	public void SetGetStreamThroughPhoton(Toggle toggle){
+		getStreamThroughPhoton = toggle.isOn;
+	}
+
+	public void OnJoinedRoom(){
+		if (!PhotonNetwork.isMasterClient && getStreamThroughPhoton) {
+			ConnectionType = ClientConnectionType.Photon;
+		} else {
+			UpdateDefinitions ();
+		}
+	}
 
     /// <summary>
     /// Returns the first <see cref="OptitrackStreamingClient"/> component located in the scene.
@@ -187,11 +310,17 @@ public class OptitrackStreamingClient : MonoBehaviour
     /// <returns>The most recent available state, or null if none available.</returns>
     public OptitrackRigidBodyState GetLatestRigidBodyState( Int32 rigidBodyId )
     {
-        OptitrackRigidBodyState rbState;
+		OptitrackRigidBodyState rbState = null;
+
 
         lock ( m_frameDataUpdateLock )
         {
-            m_latestRigidBodyStates.TryGetValue( rigidBodyId, out rbState );
+			if (ConnectionType == ClientConnectionType.Photon) {
+
+				m_photonisedLatestRigidBodyStates.TryGetValue (rigidBodyId, out rbState);
+			} else {
+				m_latestRigidBodyStates.TryGetValue (rigidBodyId, out rbState);
+			}
         }
 
         return rbState;
@@ -210,28 +339,67 @@ public class OptitrackStreamingClient : MonoBehaviour
 
         lock ( m_frameDataUpdateLock )
         {
-            m_latestSkeletonStates.TryGetValue( skeletonId, out skelState );
+			if (ConnectionType == ClientConnectionType.Photon) {
+				m_photonisedLatestSkeletonStates.TryGetValue( skeletonId, out skelState );
+
+			} else {
+				m_latestSkeletonStates.TryGetValue( skeletonId, out skelState );
+			}
         }
 
         return skelState;
     }
 
+    /// <summary>Retrieves the definition of the rigid body with the specified streaming ID.</summary>
+    /// <param name="rigidBodyId"></param>
+    /// <returns>The specified rigid body definition, or null if not found.</returns>
+    public OptitrackRigidBodyDefinition GetRigidBodyDefinitionById(Int32 rigidBodyId) {
+
+        if (ConnectionType == ClientConnectionType.Photon) {
+            for (int i = 0; i < m_rigidBodyDefinitions.Count; ++i) {
+                OptitrackRigidBodyDefinition rbDef = m_photonisedRigidBodyDefinitions[i];
+
+                if (rbDef.Id == rigidBodyId) {
+                    return rbDef;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < m_rigidBodyDefinitions.Count; ++i) {
+                OptitrackRigidBodyDefinition rbDef = m_rigidBodyDefinitions[i];
+
+                if (rbDef.Id == rigidBodyId) {
+                    return rbDef;
+                }
+            }
+        }
+        
+
+        return null;
+    }
 
     /// <summary>Retrieves the definition of the skeleton with the specified asset name.</summary>
     /// <param name="skeletonAssetName">The name of the skeleton for which to retrieve the definition.</param>
     /// <returns>The specified skeleton definition, or null if not found.</returns>
     public OptitrackSkeletonDefinition GetSkeletonDefinitionByName( string skeletonAssetName )
     {
-        for ( int i = 0; i < m_skeletonDefinitions.Count; ++i )
-        {
-            OptitrackSkeletonDefinition skelDef = m_skeletonDefinitions[i];
+		if (ConnectionType == ClientConnectionType.Photon) {
+			for (int i = 0; i < m_photonisedSkeletonDefinitions.Count; ++i) {
+				OptitrackSkeletonDefinition skelDef = m_photonisedSkeletonDefinitions [i];
 
-            if ( skelDef.Name.Equals( skeletonAssetName, StringComparison.InvariantCultureIgnoreCase ) )
-            {
-                return skelDef;
-            }
-        }
+				if (skelDef.Name.Equals (skeletonAssetName, StringComparison.InvariantCultureIgnoreCase)) {
+					return skelDef;
+				}
+			}
+		} else {
+			for (int i = 0; i < m_skeletonDefinitions.Count; ++i) {
+				OptitrackSkeletonDefinition skelDef = m_skeletonDefinitions [i];
 
+				if (skelDef.Name.Equals (skeletonAssetName, StringComparison.InvariantCultureIgnoreCase)) {
+					return skelDef;
+				}
+			}
+		}
         return null;
     }
 
@@ -242,11 +410,50 @@ public class OptitrackStreamingClient : MonoBehaviour
     /// </exception>
     public void UpdateDefinitions()
     {
+        if (m_client == null)
+            return;
+
         // This may throw an exception if the server request times out or otherwise fails.
         m_dataDescs = m_client.GetDataDescriptions();
 
         m_skeletonDefinitions.Clear();
+        m_rigidBodyDefinitions.Clear();
 
+        // Translate rigid body definitions.
+        for (int nativeRbDescIdx = 0; nativeRbDescIdx < m_dataDescs.RigidBodyDescriptions.Count; ++nativeRbDescIdx) {
+            sRigidBodyDescription nativeRb = m_dataDescs.RigidBodyDescriptions[nativeRbDescIdx];
+
+            OptitrackRigidBodyDefinition rbDef = new OptitrackRigidBodyDefinition {
+                Id = nativeRb.Id,
+                Name = nativeRb.Name,
+                Markers = new List<OptitrackRigidBodyDefinition.MarkerDefinition>(nativeRb.MarkerCount),
+            };
+
+            // Populate nested marker definitions.
+            for (int nativeMarkerIdx = 0; nativeMarkerIdx < nativeRb.MarkerCount; ++nativeMarkerIdx) {
+                int positionOffset = nativeMarkerIdx * Marshal.SizeOf(typeof(MarkerDataVector));
+                IntPtr positionPtr = new IntPtr(nativeRb.MarkerPositions.ToInt64() + positionOffset);
+
+                int labelOffset = nativeMarkerIdx * Marshal.SizeOf(typeof(Int32));
+                IntPtr labelPtr = new IntPtr(nativeRb.MarkerRequiredLabels.ToInt64() + labelOffset);
+
+                MarkerDataVector nativePos =
+                    (MarkerDataVector)Marshal.PtrToStructure(positionPtr, typeof(MarkerDataVector));
+
+                Int32 nativeLabel = Marshal.ReadInt32(labelPtr);
+
+                OptitrackRigidBodyDefinition.MarkerDefinition markerDef =
+                    new OptitrackRigidBodyDefinition.MarkerDefinition {
+                        Position = new Vector3Serializer(nativePos.Values[0], nativePos.Values[1], nativePos.Values[2]),
+                        RequiredLabel = nativeLabel,
+                    };
+
+                rbDef.Markers.Add(markerDef);
+            }
+
+            m_rigidBodyDefinitions.Add(rbDef);
+        }
+        // Translate skeleton definitions.
         for ( int nativeDescIdx = 0; nativeDescIdx < m_dataDescs.SkeletonDescriptions.Count; ++nativeDescIdx )
         {
             sSkeletonDescription nativeSkel = m_dataDescs.SkeletonDescriptions[nativeDescIdx];
@@ -262,11 +469,12 @@ public class OptitrackStreamingClient : MonoBehaviour
             {
                 sRigidBodyDescription nativeBone = nativeSkel.RigidBodies[nativeBoneIdx];
 
+                // skeptical minus on offsetx.....
                 OptitrackSkeletonDefinition.BoneDefinition boneDef = new OptitrackSkeletonDefinition.BoneDefinition {
                     Id = nativeBone.Id,
                     ParentId = nativeBone.ParentId,
                     Name = nativeBone.Name,
-                    Offset = new Vector3( nativeBone.OffsetX, nativeBone.OffsetY, nativeBone.OffsetZ ),
+                    Offset = new Vector3Serializer( -nativeBone.OffsetX, nativeBone.OffsetY, nativeBone.OffsetZ ),
                 };
 
                 skelDef.Bones.Add( boneDef );
@@ -274,51 +482,94 @@ public class OptitrackStreamingClient : MonoBehaviour
 
             m_skeletonDefinitions.Add( skelDef );
         }
-    }
 
+        BinaryFormatter binFormatter_skel = new BinaryFormatter();
+        BinaryFormatter binFormatter_rb = new BinaryFormatter();
+        MemoryStream mStream_skel = new MemoryStream();
+        MemoryStream mStream_rb = new MemoryStream();
+
+        binFormatter_skel.Serialize (mStream_skel, m_skeletonDefinitions);
+        binFormatter_rb.Serialize(mStream_rb, m_rigidBodyDefinitions);
+
+        if (PhotonNetwork.isMasterClient) {
+            photonView.RPC("RPC_UpdateDefinitions", PhotonTargets.AllBuffered, new object[] { mStream_skel.ToArray(), mStream_rb.ToArray() });
+        }
+    }
+	[PunRPC]
+	void RPC_UpdateDefinitions(byte[] skeletonDefinitions, byte[] rigidbodyDefinitions){
+		BinaryFormatter binFormatter_skel = new BinaryFormatter ();
+        BinaryFormatter binFormatter_rb = new BinaryFormatter();
+        MemoryStream mStream_skel = new MemoryStream ();
+        MemoryStream mStream_rb = new MemoryStream();
+
+        mStream_skel.Write (skeletonDefinitions, 0, skeletonDefinitions.Length);
+        mStream_skel.Position = 0;
+		m_photonisedSkeletonDefinitions = binFormatter_skel.Deserialize (mStream_skel) as List<OptitrackSkeletonDefinition>;
+
+        mStream_rb.Write(rigidbodyDefinitions, 0, rigidbodyDefinitions.Length);
+        mStream_rb.Position = 0;
+        m_photonisedRigidBodyDefinitions = binFormatter_rb.Deserialize(mStream_rb) as List<OptitrackRigidBodyDefinition>;
+    }
+	public void TriggerUpdateDefinitions(){
+        if (ConnectionType == ClientConnectionType.Photon) {
+            photonView.RPC("RPC_TriggerUpdateDefinitions", PhotonTargets.MasterClient);
+        } else {
+            UpdateDefinitions();
+        }
+    }
+	[PunRPC]
+	void RPC_TriggerUpdateDefinitions(){
+		UpdateDefinitions ();
+	}
 
     /// <summary>
     /// (Re)initializes <see cref="m_client"/> and connects to the configured streaming server.
     /// </summary>
-    void OnEnable()
-    {
+    void OnEnable(){
+		InitializeConnection ();
+    }
+	public void InitializeConnection(){
 		if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable ()) {
 			LocalAddress = GetLocalIPAddress ();
 		} else {
 			Debug.LogError("No local network found");
 		}
-        IPAddress serverAddr = IPAddress.Parse( ServerAddress );
-        IPAddress localAddr = IPAddress.Parse( LocalAddress );
+		IPAddress serverAddr = IPAddress.Parse( ServerAddress );
+		IPAddress localAddr = IPAddress.Parse( LocalAddress );
 
-        NatNetConnectionType connType;
-        switch ( ConnectionType )
-        {
-            case ClientConnectionType.Unicast:
-                connType = NatNetConnectionType.NatNetConnectionType_Unicast;
-                break;
-            case ClientConnectionType.Multicast:
-            default:
-                connType = NatNetConnectionType.NatNetConnectionType_Multicast;
-                break;
-        }
+		NatNetConnectionType connType;
+		switch ( ConnectionType )
+		{
+		case ClientConnectionType.Unicast:
+			connType = NatNetConnectionType.NatNetConnectionType_Unicast;
+			break;
+		case ClientConnectionType.Multicast:
+		default:
+			connType = NatNetConnectionType.NatNetConnectionType_Multicast;
+			break;
+		case ClientConnectionType.Photon:
+			return;
+		}
 
-        try
-        {
-            m_client = new NatNetClient( connType );
-            m_client.Connect( localAddr, serverAddr );
-            UpdateDefinitions();
-        }
-        catch ( Exception ex )
-        {
-            Debug.LogException( ex, this );
-            Debug.LogError( GetType().FullName + ": Error connecting to server; check your configuration, and make sure the server is currently streaming.", this );
-            this.enabled = false;
-            return;
-        }
+		try
+		{
+			m_client = new NatNetClient();
+			m_client.Connect( connType, localAddr, serverAddr );
+            //UpdateDefinitions(); // changed to latest
+		}
+		catch ( Exception ex )
+		{
+//			Debug.LogException( ex, this );
+//			Debug.LogError( GetType().FullName + ": Error connecting to server; check your configuration, and make sure the server is currently streaming.", this );
+			//Add Call to fallback, giving an error message
+			Fallback.Instance.SendErrorMessage("Couldn't connect to motive. Make sure Motive has started and then relaunch playmode");
+			this.enabled = false;
+			return;
+		}
 
-        m_client.NativeFrameReceived += OnNatNetFrameReceived;
-        m_connectionHealthCoroutine = StartCoroutine( CheckConnectionHealth() );
-    }
+		m_client.NativeFrameReceived += OnNatNetFrameReceived;
+		m_connectionHealthCoroutine = StartCoroutine( CheckConnectionHealth() );
+	}
 
 
     /// <summary>
@@ -460,30 +711,31 @@ public class OptitrackStreamingClient : MonoBehaviour
                 // Ensure we have a state corresponding to this rigid body ID.
                 OptitrackRigidBodyState rbState = GetOrCreateRigidBodyState( rbData.Id );
 
+                //TODO: optitrackhirestimer can be used as a clapper in motive
                 rbState.DeliveryTimestamp = OptitrackHiResTimer.Now();
 
                 // Flip coordinate handedness from right to left by inverting X and W.
-                rbState.Pose.Position = new Vector3( -rbData.X, rbData.Y, rbData.Z );
-                rbState.Pose.Orientation = new Quaternion( -rbData.QX, rbData.QY, rbData.QZ, -rbData.QW );
+				rbState.Pose.Position = new Vector3Serializer( -rbData.X, rbData.Y, rbData.Z );
+				rbState.Pose.Orientation = new QuaternionSerializer( -rbData.QX, rbData.QY, rbData.QZ, -rbData.QW );
 
-                rbState.Markers.Clear();
+     //           rbState.Markers.Clear();
 
-                for ( int markerIdx = 0; markerIdx < rbData.MarkerCount; ++markerIdx )
-                {
-                    float markerX, markerY, markerZ;
-                    result = NaturalPoint.NatNetLib.NativeMethods.NatNet_Frame_RigidBody_Marker_GetPosition( pFrame, rbIdx, markerIdx, out markerX, out markerY, out markerZ );
-                    NatNetException.ThrowIfNotOK( result, "NatNet_Frame_RigidBody_Marker_GetPosition failed." );
+     //           for ( int markerIdx = 0; markerIdx < rbData.MarkerCount; ++markerIdx )
+     //           {
+     //               float markerX, markerY, markerZ;
+					//result = NaturalPoint.NatNetLib.NativeMethods.NatNet_Frame_RigidBody_Marker_GetPosition( pFrame, rbIdx, markerIdx, out markerX, out markerY, out markerZ );
+     //               NatNetException.ThrowIfNotOK( result, "NatNet_Frame_RigidBody_Marker_GetPosition failed." );
 
-                    float markerSize;
-                    result = NaturalPoint.NatNetLib.NativeMethods.NatNet_Frame_RigidBody_Marker_GetSize( pFrame, rbIdx, markerIdx, out markerSize );
-                    NatNetException.ThrowIfNotOK( result, "NatNet_Frame_RigidBody_Marker_GetPosition failed." );
+     //               float markerSize;
+     //               result = NaturalPoint.NatNetLib.NativeMethods.NatNet_Frame_RigidBody_Marker_GetSize( pFrame, rbIdx, markerIdx, out markerSize );
+     //               NatNetException.ThrowIfNotOK( result, "NatNet_Frame_RigidBody_Marker_GetPosition failed." );
 
-                    // Change of basis from right- to left-handed by inverting X.
-                    rbState.Markers.Add( new OptitrackMarkerState {
-                        Position = new Vector3( -markerX, markerY, markerZ ),
-                        Size = markerSize
-                    } );
-                }
+     //               // Change of basis from right- to left-handed by inverting X.
+     //               rbState.Markers.Add( new OptitrackMarkerState {
+					//	Position = new Vector3Serializer( -markerX, markerY, markerZ ),
+     //                   Size = markerSize
+     //               } );
+     //           }
             }
 
             // Update skeletons.
@@ -524,8 +776,8 @@ public class OptitrackStreamingClient : MonoBehaviour
                     }
 
                     // Flip coordinate handedness from right to left by inverting X and W.
-                    skelState.BonePoses[boneId].Position = new Vector3( -boneData.X, boneData.Y, boneData.Z );
-                    skelState.BonePoses[boneId].Orientation = new Quaternion( -boneData.QX, boneData.QY, boneData.QZ, -boneData.QW );
+					skelState.BonePoses[boneId].Position = new Vector3Serializer( -boneData.X, boneData.Y, boneData.Z );
+					skelState.BonePoses[boneId].Orientation = new QuaternionSerializer( -boneData.QX, boneData.QY, boneData.QZ, -boneData.QW );
                 }
             }
         }
@@ -560,7 +812,7 @@ public class OptitrackStreamingClient : MonoBehaviour
         {
             OptitrackRigidBodyState newRbState = new OptitrackRigidBodyState {
                 Pose = new OptitrackPose(),
-                Markers = new List<OptitrackMarkerState>(),
+                //Markers = new List<OptitrackMarkerState>(),
             };
 
             m_latestRigidBodyStates[rigidBodyId] = newRbState;
@@ -613,4 +865,61 @@ public class OptitrackStreamingClient : MonoBehaviour
         Monitor.Exit( m_frameDataUpdateLock );
     }
     #endregion Private methods
+
+	public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if (stream.isWriting )
+		{
+			BinaryFormatter binFormatter = new BinaryFormatter ();
+			MemoryStream mStream = new MemoryStream ();
+
+			binFormatter.Serialize (mStream, m_latestRigidBodyStates);
+			stream.SendNext(mStream.ToArray ());
+
+
+
+			binFormatter = new BinaryFormatter ();
+			mStream = new MemoryStream ();
+
+			binFormatter.Serialize (mStream, m_latestSkeletonStates);
+			stream.SendNext(mStream.ToArray ());
+		}
+		else
+		{
+			BinaryFormatter binFormatter = new BinaryFormatter ();
+			MemoryStream mStream = new MemoryStream ();
+
+//			m_previousPhotonisedLatestRigidBodyStates = m_photonisedLatestRigidBodyStates;
+		
+			byte[] byteArray = (byte[])stream.ReceiveNext ();
+			mStream.Write (byteArray, 0, byteArray.Length);
+			mStream.Position = 0;
+			m_photonisedLatestRigidBodyStates = binFormatter.Deserialize (mStream) as Dictionary<int, OptitrackRigidBodyState>;
+
+			foreach(var item in m_photonisedLatestRigidBodyStates){
+				m_photonisedLatestRigidBodyStates [item.Key].Pose.ResetTime ();
+			}
+
+//			foreach(var item in m_previousPhotonisedLatestRigidBodyStates){
+//				Debug.Log ("item: " + item);
+//				Debug.Log ("item.key: " + item.Key);
+//				Debug.Log ("item.Value: " + item.Value);
+//				OptitrackRigidBodyState ors = item.Value as OptitrackRigidBodyState;
+//				m_photonisedLatestRigidBodyStates[item.Key].Pose.previousUpdatedPositon = ors.Pose.Position;
+//				m_photonisedLatestRigidBodyStates[item.Key].Pose.previousUpdatedOrientation = ors.Pose.Orientation;
+//			}
+			// THESE NEW DICTIONARIES OVVERRIDES THE LERP
+
+			binFormatter = new BinaryFormatter ();
+			mStream = new MemoryStream ();
+
+//			m_previousPhotonisedLatestSkeletonStates = m_photonisedLatestSkeletonStates;
+
+
+			byteArray = (byte[])stream.ReceiveNext ();
+			mStream.Write (byteArray, 0, byteArray.Length);
+			mStream.Position = 0;
+			m_photonisedLatestSkeletonStates = binFormatter.Deserialize (mStream) as Dictionary<int, OptitrackSkeletonState>;
+		}
+	}
 }

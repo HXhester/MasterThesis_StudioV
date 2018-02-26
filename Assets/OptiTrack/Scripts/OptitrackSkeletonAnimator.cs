@@ -55,6 +55,12 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
 
     /// <summary>Set up to write poses to this GameObject using <see cref="DestinationAvatar"/>.</summary>
     private HumanPoseHandler m_destPoseHandler;
+
+    private float angleX;
+    private float angleY;
+    private float angleZ;
+
+    private Transform HmdCam;
     #endregion Private fields
 
 
@@ -73,12 +79,16 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
                 return;
             }
         }
+        this.StreamingClient.TriggerUpdateDefinitions();
 
         redirectSkeleton();
+
+        //HmdCam = GameObject.Find("Camera (eye)").transform;
     }
 
     void OnEnable()
     {
+
         redirectSkeleton();
     }
 
@@ -88,9 +98,11 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
         
     }
 
-
     void Update()
     {
+        if (StreamingClient == null) {
+            return;
+        }
         OptitrackSkeletonState skelState = StreamingClient.GetLatestSkeletonState( m_skeletonDef.Id );
         if ( skelState != null )
         {
@@ -105,11 +117,119 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
                 bool foundObject = m_boneObjectMap.TryGetValue( boneId, out boneObject );
                 if ( foundPose && foundObject )
                 {
+					
+                    Vector3 startPos = boneObject.transform.localPosition;
+					Vector3 endPos = bonePose.Position.V3;
+                    float journey = (startPos - endPos).magnitude;
+                    // if bone position change too large, then move smaller
+//                    if (journey > 0.1f)
+//                    {
+//                        boneObject.transform.localPosition =
+//                            Vector3.Lerp(startPos, endPos, Time.deltaTime / (5 * journey));
+//						Debug.Log ("lerping skeleton");
+//                    }
+//                    else
+//                    {
+//						boneObject.transform.localPosition = bonePose.Position.V3;
+//                    }
+					if (StreamingClient.ConnectionType == OptitrackStreamingClient.ClientConnectionType.Photon) {
+						boneObject.transform.localPosition = Vector3.Lerp (startPos, endPos, Time.deltaTime * 15);
+					} else {
+						boneObject.transform.localPosition = bonePose.Position.V3;
+					}
 
-					boneObject.transform.localPosition = bonePose.Position;
-					boneObject.transform.localRotation = bonePose.Orientation;
+                    // Clamp retargetted optitrack bones
+                    #region Clamp bone rotation
+                    angleX = bonePose.Orientation.Q.eulerAngles.x;
+                    angleY = bonePose.Orientation.Q.eulerAngles.y;
+                    angleZ = bonePose.Orientation.Q.eulerAngles.z;
 
-						      
+                    if (bonePose.Orientation.Q.eulerAngles.x > 180f)
+                    {
+                        angleX = bonePose.Orientation.Q.eulerAngles.x - 360;
+                    }
+                    if (bonePose.Orientation.Q.eulerAngles.y > 180f)
+                    {
+                        angleY = bonePose.Orientation.Q.eulerAngles.y - 360;
+                    }
+                    if (bonePose.Orientation.Q.eulerAngles.z > 180f)
+                    {
+                        angleZ = bonePose.Orientation.Q.eulerAngles.z - 360;
+                    }
+
+                    if (boneObject.name.Contains("LThumb1"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.LThumb1.xMin, BoneLimit.LThumb1.yMin,
+                            BoneLimit.LThumb1.zMin,
+                            BoneLimit.LThumb1.xMax, BoneLimit.LThumb1.yMax, BoneLimit.LThumb1.zMax);
+                    }
+                    else if (boneObject.name.Contains("LThumb2"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.LThumb2.xMin, BoneLimit.LThumb2.yMin,
+                            BoneLimit.LThumb2.zMin,
+                            BoneLimit.LThumb2.xMax, BoneLimit.LThumb2.yMax, BoneLimit.LThumb2.zMax);
+                    }
+
+                    else if (boneObject.name.Contains("RThumb1"))
+                    {
+
+                        SetBoneRotation(boneObject, BoneLimit.RThumb1.xMin, BoneLimit.RThumb1.yMin,
+                            BoneLimit.RThumb1.zMin,
+                            BoneLimit.RThumb1.xMax, BoneLimit.RThumb1.yMax, BoneLimit.RThumb1.zMax);
+
+                    }
+                    else if (boneObject.name.Contains("RThumb2"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.RThumb2.xMin, BoneLimit.RThumb2.yMin,
+                            BoneLimit.RThumb2.zMin,
+                            BoneLimit.RThumb2.xMax, BoneLimit.RThumb2.yMax, BoneLimit.RThumb2.zMax);
+
+                    }
+
+                    else if (boneObject.name.Contains("RIndex1") || boneObject.name.Contains("RRing1") ||
+                             boneObject.name.Contains("RMiddle1") || boneObject.name.Contains("RPinky1"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.RRing1.xMin, BoneLimit.RRing1.yMin, BoneLimit.RRing1.zMin,
+                            BoneLimit.RRing1.xMax, BoneLimit.RRing1.yMax, BoneLimit.RRing1.zMax);
+
+                    }
+                    else if (boneObject.name.Contains("RIndex2") || boneObject.name.Contains("RIndex3") ||
+                             boneObject.name.Contains("RRing2") || boneObject.name.Contains("RRing3")
+                             || boneObject.name.Contains("RMiddle2") || boneObject.name.Contains("RMiddle3") ||
+                             boneObject.name.Contains("RPinky2") || boneObject.name.Contains("RPinky3"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.RRing2.xMin, BoneLimit.RRing2.yMin, BoneLimit.RRing2.zMin,
+                            BoneLimit.RRing2.xMax, BoneLimit.RRing2.yMax, BoneLimit.RRing2.zMax);
+                    }
+                    else if (boneObject.name.Contains("LIndex1") || boneObject.name.Contains("LRing1") ||
+                             boneObject.name.Contains("LMiddle1") || boneObject.name.Contains("LPinky1"))
+                    {
+
+                        SetBoneRotation(boneObject, BoneLimit.LRing1.xMin, BoneLimit.LRing1.yMin, BoneLimit.LRing1.zMin,
+                            BoneLimit.LRing1.xMax, BoneLimit.LRing1.yMax, BoneLimit.LRing1.zMax);
+                    }
+
+                    else if (boneObject.name.Contains("LIndex2") || boneObject.name.Contains("LIndex3") ||
+                             boneObject.name.Contains("LRing2") || boneObject.name.Contains("LRing3")
+                             || boneObject.name.Contains("LMiddle2") || boneObject.name.Contains("LMiddle3") ||
+                             boneObject.name.Contains("LPinky2") || boneObject.name.Contains("LPinky3"))
+                    {
+                        SetBoneRotation(boneObject, BoneLimit.LRing2.xMin, BoneLimit.LRing2.yMin, BoneLimit.LRing2.zMin,
+                            BoneLimit.LRing2.xMax, BoneLimit.LRing2.yMax, BoneLimit.LRing2.zMax);
+                    }
+
+ 
+                    else
+                    {
+						if(StreamingClient.ConnectionType == OptitrackStreamingClient.ClientConnectionType.Photon){
+							boneObject.transform.localRotation = Quaternion.Lerp(boneObject.transform.localRotation, bonePose.Orientation.Q, Time.deltaTime * 15);
+						}else{
+							boneObject.transform.localRotation = bonePose.Orientation.Q;
+						}
+
+                    }
+
+                    #endregion
                 }
             }
 
@@ -172,7 +292,7 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
 
             SkeletonBone skelBone = new SkeletonBone();
             skelBone.name = boneDef.Name;
-            skelBone.position = boneDef.Offset;
+			skelBone.position = boneDef.Offset.V3;
             skelBone.rotation = Quaternion.identity;
             skelBone.scale = Vector3.one;
 
@@ -227,21 +347,25 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
                 m_cachedMecanimBoneNameMap.Add( "Chest",            assetName + "_Chest" );
                 m_cachedMecanimBoneNameMap.Add( "Neck",             assetName + "_Neck" );
                 m_cachedMecanimBoneNameMap.Add( "Head",             assetName + "_Head" );
+
                 m_cachedMecanimBoneNameMap.Add( "LeftShoulder",     assetName + "_LShoulder" );
                 m_cachedMecanimBoneNameMap.Add( "LeftUpperArm",     assetName + "_LUArm" );
                 m_cachedMecanimBoneNameMap.Add( "LeftLowerArm",     assetName + "_LFArm" );
                 m_cachedMecanimBoneNameMap.Add( "LeftHand",         assetName + "_LHand" );
+
                 m_cachedMecanimBoneNameMap.Add( "RightShoulder",    assetName + "_RShoulder" );
                 m_cachedMecanimBoneNameMap.Add( "RightUpperArm",    assetName + "_RUArm" );
                 m_cachedMecanimBoneNameMap.Add( "RightLowerArm",    assetName + "_RFArm" );
                 m_cachedMecanimBoneNameMap.Add( "RightHand",        assetName + "_RHand" );
+
                 m_cachedMecanimBoneNameMap.Add( "LeftUpperLeg",     assetName + "_LThigh" );
                 m_cachedMecanimBoneNameMap.Add( "LeftLowerLeg",     assetName + "_LShin" );
                 m_cachedMecanimBoneNameMap.Add( "LeftFoot",         assetName + "_LFoot" );
+                m_cachedMecanimBoneNameMap.Add("LeftToeBase",       assetName + "_LToe");
+
                 m_cachedMecanimBoneNameMap.Add( "RightUpperLeg",    assetName + "_RThigh" );
                 m_cachedMecanimBoneNameMap.Add( "RightLowerLeg",    assetName + "_RShin" );
                 m_cachedMecanimBoneNameMap.Add( "RightFoot",        assetName + "_RFoot" );
-                m_cachedMecanimBoneNameMap.Add( "LeftToeBase",      assetName + "_LToe" );
                 m_cachedMecanimBoneNameMap.Add( "RightToeBase",     assetName + "_RToe" );
 
                 m_cachedMecanimBoneNameMap.Add( "Left Thumb Proximal",      assetName + "_LThumb1" );
@@ -285,22 +409,61 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
                 m_cachedMecanimBoneNameMap.Add( "Chest",            assetName + "_Spine1" );
                 m_cachedMecanimBoneNameMap.Add( "Neck",             assetName + "_Neck" );
                 m_cachedMecanimBoneNameMap.Add( "Head",             assetName + "_Head" );
+
                 m_cachedMecanimBoneNameMap.Add( "LeftShoulder",     assetName + "_LeftShoulder" );
                 m_cachedMecanimBoneNameMap.Add( "LeftUpperArm",     assetName + "_LeftArm" );
                 m_cachedMecanimBoneNameMap.Add( "LeftLowerArm",     assetName + "_LeftForeArm" );
                 m_cachedMecanimBoneNameMap.Add( "LeftHand",         assetName + "_LeftHand" );
+
                 m_cachedMecanimBoneNameMap.Add( "RightShoulder",    assetName + "_RightShoulder" );
                 m_cachedMecanimBoneNameMap.Add( "RightUpperArm",    assetName + "_RightArm" );
                 m_cachedMecanimBoneNameMap.Add( "RightLowerArm",    assetName + "_RightForeArm" );
                 m_cachedMecanimBoneNameMap.Add( "RightHand",        assetName + "_RightHand" );
+
                 m_cachedMecanimBoneNameMap.Add( "LeftUpperLeg",     assetName + "_LeftUpLeg" );
                 m_cachedMecanimBoneNameMap.Add( "LeftLowerLeg",     assetName + "_LeftLeg" );
                 m_cachedMecanimBoneNameMap.Add( "LeftFoot",         assetName + "_LeftFoot" );
+                m_cachedMecanimBoneNameMap.Add("LeftToeBase",       assetName + "_LeftToeBase");
+
                 m_cachedMecanimBoneNameMap.Add( "RightUpperLeg",    assetName + "_RightUpLeg" );
                 m_cachedMecanimBoneNameMap.Add( "RightLowerLeg",    assetName + "_RightLeg" );
-                m_cachedMecanimBoneNameMap.Add( "RightFoot",        assetName + "_RightFoot" );
-                m_cachedMecanimBoneNameMap.Add( "LeftToeBase",      assetName + "_LeftToeBase" );
+                m_cachedMecanimBoneNameMap.Add( "RightFoot",        assetName + "_RightFoot" ); 
                 m_cachedMecanimBoneNameMap.Add( "RightToeBase",     assetName + "_RightToeBase" );
+
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Proximal", assetName + "_LeftHandThumb1");
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Intermediate", assetName + "_LeftHandThumb2");
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Distal", assetName + "_LeftHandThumb3");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Proximal", assetName + "_RightHandThumb1");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Intermediate", assetName + "_RightHandThumb2");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Distal", assetName + "_RightHandThumb3");
+
+                m_cachedMecanimBoneNameMap.Add("Left Index Proximal", assetName + "_LeftHandIndex1");
+                m_cachedMecanimBoneNameMap.Add("Left Index Intermediate", assetName + "_LeftHandIndex2");
+                m_cachedMecanimBoneNameMap.Add("Left Index Distal", assetName + "_LeftHandIndex3");
+                m_cachedMecanimBoneNameMap.Add("Right Index Proximal", assetName + "_RightHandIndex1");
+                m_cachedMecanimBoneNameMap.Add("Right Index Intermediate", assetName + "_RightHandIndex2");
+                m_cachedMecanimBoneNameMap.Add("Right Index Distal", assetName + "_RightHandIndex3");
+
+                m_cachedMecanimBoneNameMap.Add("Left Middle Proximal", assetName + "_LeftHandMiddle1");
+                m_cachedMecanimBoneNameMap.Add("Left Middle Intermediate", assetName + "_LeftHandMiddle2");
+                m_cachedMecanimBoneNameMap.Add("Left Middle Distal", assetName + "_LeftHandMiddle3");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Proximal", assetName + "_RightHandMiddle1");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Intermediate", assetName + "_RightHandMiddle2");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Distal", assetName + "_RightHandMiddle3");
+
+                m_cachedMecanimBoneNameMap.Add("Left Ring Proximal", assetName + "_LeftHandRing1");
+                m_cachedMecanimBoneNameMap.Add("Left Ring Intermediate", assetName + "_LeftHandRing2");
+                m_cachedMecanimBoneNameMap.Add("Left Ring Distal", assetName + "_LeftHandRing3");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Proximal", assetName + "_RightHandRing1");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Intermediate", assetName + "_RightHandRing2");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Distal", assetName + "_RightHandRing3");
+
+                m_cachedMecanimBoneNameMap.Add("Left Little Proximal", assetName + "_LeftHandPinky1");
+                m_cachedMecanimBoneNameMap.Add("Left Little Intermediate", assetName + "_LeftHandPinky2");
+                m_cachedMecanimBoneNameMap.Add("Left Little Distal", assetName + "_LeftHandPinky3");
+                m_cachedMecanimBoneNameMap.Add("Right Little Proximal", assetName + "_RightHandPinky1");
+                m_cachedMecanimBoneNameMap.Add("Right Little Intermediate", assetName + "_RightHandPinky2");
+                m_cachedMecanimBoneNameMap.Add("Right Little Distal", assetName + "_RightHandPinky3");
                 break;
             case OptitrackBoneNameConvention.BVH:
                 m_cachedMecanimBoneNameMap.Add( "Hips",             assetName + "_Hips" );
@@ -324,6 +487,41 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
                 m_cachedMecanimBoneNameMap.Add( "RightFoot",        assetName + "_RightAnkle" );
                 m_cachedMecanimBoneNameMap.Add( "LeftToeBase",      assetName + "_LeftToe" );
                 m_cachedMecanimBoneNameMap.Add( "RightToeBase",     assetName + "_RightToe" );
+
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Proximal", assetName + "_LeftFinger0");
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Intermediate", assetName + "_LeftFinger01");
+                m_cachedMecanimBoneNameMap.Add("Left Thumb Distal", assetName + "_LeftFinger02");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Proximal", assetName + "_RightFinger0");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Intermediate", assetName + "_RightFinger01");
+                m_cachedMecanimBoneNameMap.Add("Right Thumb Distal", assetName + "_RightFinger02");
+
+                m_cachedMecanimBoneNameMap.Add("Left Index Proximal", assetName + "_LeftFinger1");
+                m_cachedMecanimBoneNameMap.Add("Left Index Intermediate", assetName + "_LeftFinger11");
+                m_cachedMecanimBoneNameMap.Add("Left Index Distal", assetName + "_LeftFinger12");
+                m_cachedMecanimBoneNameMap.Add("Right Index Proximal", assetName + "_RightFinger1");
+                m_cachedMecanimBoneNameMap.Add("Right Index Intermediate", assetName + "_RightFinger11");
+                m_cachedMecanimBoneNameMap.Add("Right Index Distal", assetName + "_RightFinger12");
+
+                m_cachedMecanimBoneNameMap.Add("Left Middle Proximal", assetName + "_LeftFinger2");
+                m_cachedMecanimBoneNameMap.Add("Left Middle Intermediate", assetName + "_LeftFinger21");
+                m_cachedMecanimBoneNameMap.Add("Left Middle Distal", assetName + "_LeftFinger22");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Proximal", assetName + "_RightFinger2");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Intermediate", assetName + "_RightFinger21");
+                m_cachedMecanimBoneNameMap.Add("Right Middle Distal", assetName + "_RightFinger22");
+
+                m_cachedMecanimBoneNameMap.Add("Left Ring Proximal", assetName + "_LeftFinger3");
+                m_cachedMecanimBoneNameMap.Add("Left Ring Intermediate", assetName + "_LeftFinger31");
+                m_cachedMecanimBoneNameMap.Add("Left Ring Distal", assetName + "_LeftFinger32");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Proximal", assetName + "_RightFinger3");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Intermediate", assetName + "_RightFinger31");
+                m_cachedMecanimBoneNameMap.Add("Right Ring Distal", assetName + "_RightFinger32");
+
+                m_cachedMecanimBoneNameMap.Add("Left Little Proximal", assetName + "_LeftFinger4");
+                m_cachedMecanimBoneNameMap.Add("Left Little Intermediate", assetName + "_LeftFinger41");
+                m_cachedMecanimBoneNameMap.Add("Left Little Distal", assetName + "_LeftFinger42");
+                m_cachedMecanimBoneNameMap.Add("Right Little Proximal", assetName + "_RightFinger4");
+                m_cachedMecanimBoneNameMap.Add("Right Little Intermediate", assetName + "_RightFinger41");
+                m_cachedMecanimBoneNameMap.Add("Right Little Distal", assetName + "_RightFinger42");
                 break;
         }
     }
@@ -364,7 +562,7 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
 
             GameObject boneObject = new GameObject(boneDef.Name);
             boneObject.transform.parent = boneDef.ParentId == 0 ? m_rootObject.transform : m_boneObjectMap[boneDef.ParentId].transform;
-            boneObject.transform.localPosition = boneDef.Offset;
+			boneObject.transform.localPosition = boneDef.Offset.V3;
             m_boneObjectMap[boneDef.Id] = boneObject;
         }
 
@@ -375,6 +573,34 @@ public class OptitrackSkeletonAnimator : MonoBehaviour
         m_rootObject.transform.parent = this.StreamingClient.transform;
         m_rootObject.transform.localPosition = Vector3.zero;
         m_rootObject.transform.localRotation = Quaternion.identity;
+    }
+
+
+    void SetBoneRotation(GameObject obj, float xMin, float yMin, float zMin, float xMax, float yMax, float zMax)
+    {
+
+        angleX = Mathf.Clamp(angleX, xMin, xMax);
+        angleY = Mathf.Clamp(angleY, yMin, yMax);
+        angleZ = Mathf.Clamp(angleZ, zMin, zMax);
+
+        obj.transform.localEulerAngles = new Vector3(angleX, angleY, angleZ);
+    }
+
+    static Quaternion toQuaternion(float pitch, float yaw, float roll)
+    {
+        Quaternion q;
+        float t0 = Mathf.Cos(yaw * 0.5f);
+        float t1 = Mathf.Sin(yaw * 0.5f);
+        float t2 = Mathf.Cos(roll * 0.5f);
+        float t3 = Mathf.Sin(roll * 0.5f);
+        float t4 = Mathf.Cos(pitch * 0.5f);
+        float t5 = Mathf.Sin(pitch * 0.5f);
+
+        q.w = t0 * t2 * t4 + t1 * t3 * t5;
+        q.x = t0 * t3 * t4 - t1 * t2 * t5;
+        q.y = t0 * t2 * t5 + t1 * t3 * t4;
+        q.z = t1 * t2 * t4 - t0 * t3 * t5;
+        return q;
     }
 
     #endregion Private methods

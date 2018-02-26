@@ -14,7 +14,12 @@ public class OptitrackRigidBodyEditor : Editor
             if ( m_cachedMarkerMaterial )
                 return m_cachedMarkerMaterial;
 
-            m_cachedMarkerMaterial = AssetDatabase.LoadAssetAtPath<Material>( "Assets/OptiTrack/Editor/Materials/MarkerMaterial.mat" );
+            m_cachedMarkerMaterial = Instantiate( AssetDatabase.LoadAssetAtPath<Material>( "Assets/OptiTrack/Editor/Materials/MarkerMaterial.mat" ) );
+
+            // For some reason, our usage pattern of DrawMeshNow within OnSceneGUI
+            // necessitates an explicit linear-to-gamma conversion on the shader color.
+            m_cachedMarkerMaterial.EnableKeyword( "_FORCE_TO_GAMMA" );
+
             return m_cachedMarkerMaterial;
         }
     }
@@ -27,7 +32,7 @@ public class OptitrackRigidBodyEditor : Editor
             if ( m_cachedMarkerMesh )
                 return m_cachedMarkerMesh;
 
-            m_cachedMarkerMesh = AssetDatabase.LoadAssetAtPath<Mesh>( "Assets/OptiTrack/Editor/Meshes/MarkerMesh.fbx" );
+            m_cachedMarkerMesh = Instantiate( AssetDatabase.LoadAssetAtPath<Mesh>( "Assets/OptiTrack/Editor/Meshes/MarkerMesh.fbx" ) );
             return m_cachedMarkerMesh;
         }
     }
@@ -49,22 +54,30 @@ public class OptitrackRigidBodyEditor : Editor
 
         try
         {
+            OptitrackRigidBodyDefinition rbDef = rb.StreamingClient.GetRigidBodyDefinitionById( rb.RigidBodyId );
             OptitrackRigidBodyState rbState = rb.StreamingClient.GetLatestRigidBodyState( rb.RigidBodyId );
 
-            if ( rbState != null && rbState.Markers != null )
+            if ( rbDef != null && rbState != null )
             {
-                for ( int iMarker = 0; iMarker < rbState.Markers.Count; ++iMarker )
+                for ( int iMarker = 0; iMarker < rbDef.Markers.Count; ++iMarker )
                 {
-                    OptitrackMarkerState marker = rbState.Markers[iMarker];
-                    Vector3 markerPos = marker.Position;
+                    OptitrackRigidBodyDefinition.MarkerDefinition marker = rbDef.Markers[iMarker];
 
-                    if ( rb.transform.parent )
+                    // Effectively treat the RB GameObject transform as a rigid transform by negating its local scale.
+                    Vector3 markerPos = marker.Position.V3;
+                    markerPos.Scale( new Vector3( 1.0f / rb.transform.localScale.x, 1.0f / rb.transform.localScale.y, 1.0f / rb.transform.localScale.z ) );
+                    markerPos = rb.transform.TransformPoint( markerPos );
+
+                    float kMarkerSize = 0.02f;
+                    Matrix4x4 markerTransform = Matrix4x4.TRS( markerPos, Quaternion.identity, new Vector3( kMarkerSize, kMarkerSize, kMarkerSize ) );
+
+                    for ( int iPass = 0; iPass < m_markerMaterial.passCount; ++iPass )
                     {
-                        markerPos = rb.transform.parent.TransformPoint( markerPos );
+                        if ( m_markerMaterial.SetPass( iPass ) )
+                        {
+                            Graphics.DrawMeshNow( m_markerMesh, markerTransform );
+                        }
                     }
-
-                    Matrix4x4 markerTransform = Matrix4x4.TRS( markerPos, Quaternion.identity, new Vector3( marker.Size, marker.Size, marker.Size ) );
-                    Graphics.DrawMesh( m_markerMesh, markerTransform, m_markerMaterial, 0, camera: null, submeshIndex: 0, properties: null, castShadows: false, receiveShadows: false );
                 }
             }
         }

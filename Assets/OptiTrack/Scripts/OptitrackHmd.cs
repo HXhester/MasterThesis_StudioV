@@ -5,7 +5,6 @@
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.VR;
 
 
 public class OptitrackHmd : MonoBehaviour
@@ -103,12 +102,12 @@ public class OptitrackHmd : MonoBehaviour
         if ( rbState != null && rbState.DeliveryTimestamp.AgeSeconds < 1.0f )
         {
             // Update position.
-            this.transform.localPosition = rbState.Pose.Position;
+			this.transform.localPosition = rbState.Pose.Position.V3;
 
             // Update drift correction.
             if ( m_driftCorrHandle != IntPtr.Zero && m_hmdCameraObject )
             {
-                NpHmdQuaternion opticalOri = new NpHmdQuaternion( rbState.Pose.Orientation );
+				NpHmdQuaternion opticalOri = new NpHmdQuaternion( rbState.Pose.Orientation.Q );
                 NpHmdQuaternion inertialOri = new NpHmdQuaternion( m_hmdCameraObject.transform.localRotation );
 
                 NpHmdResult result = NativeMethods.NpHmd_MeasurementUpdate(
