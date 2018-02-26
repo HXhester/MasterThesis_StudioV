@@ -1,10 +1,8 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Hidden/OptiTrack/Editor/MarkerShader"
+﻿Shader "Hidden/OptiTrack/Editor/MarkerShader"
 {
     Properties
     {
-        _Color("Color", Color) = (1,1,1,1)
+        _Color( "Color", Color ) = (1,1,1,1)
     }
 
     SubShader
@@ -24,6 +22,7 @@ Shader "Hidden/OptiTrack/Editor/MarkerShader"
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
+            #pragma shader_feature _FORCE_TO_GAMMA
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
@@ -46,12 +45,16 @@ Shader "Hidden/OptiTrack/Editor/MarkerShader"
             {
                 VertexOut Out;
                 Out.color = _Color;
-                Out.position = UnityObjectToClipPos( float4(In.position.xyz, 1.0) );
+                Out.position = UnityObjectToClipPos( float4( In.position.xyz, 1.0 ) );
                 return Out;
             }
 
             fixed4 frag( VertexOut In ) : SV_Target
             {
+#if _FORCE_TO_GAMMA
+                In.color.rgb = LinearToGammaSpace( In.color.rgb );
+#endif // #if _FORCE_TO_GAMMA
+
                 return In.color;
             }
             ENDCG
@@ -62,6 +65,7 @@ Shader "Hidden/OptiTrack/Editor/MarkerShader"
         Pass
         {
             CGPROGRAM
+            #pragma shader_feature _FORCE_TO_GAMMA
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
@@ -90,7 +94,11 @@ Shader "Hidden/OptiTrack/Editor/MarkerShader"
 
             fixed4 frag( VertexOut In ) : SV_Target
             {
-                return In.color;
+#if _FORCE_TO_GAMMA
+                In.color.rgb = LinearToGammaSpace( In.color.rgb );
+#endif // #if _FORCE_TO_GAMMA
+
+                return fixed4( In.color.rgb, 1.0 );
             }
             ENDCG
         }

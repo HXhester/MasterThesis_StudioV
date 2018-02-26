@@ -26,17 +26,43 @@ public class OptitrackRigidBody : MonoBehaviour
                 this.enabled = false;
                 return;
             }
+            
+            this.StreamingClient.TriggerUpdateDefinitions();
+            
         }
     }
+
+	public float lerpSpeed = 5f;
+
+#if UNITY_2017_1_OR_NEWER
+    void OnEnable() {
+        Application.onBeforeRender += OnBeforeRender;
+    }
+
+
+    void OnDisable() {
+        Application.onBeforeRender -= OnBeforeRender;
+    }
+
+
+    void OnBeforeRender() {
+        UpdatePose();
+    }
+#endif
 
 
     void Update()
     {
-        OptitrackRigidBodyState rbState = StreamingClient.GetLatestRigidBodyState( RigidBodyId );
-        if ( rbState != null )
-        {
-            this.transform.localPosition = rbState.Pose.Position;
-            this.transform.localRotation = rbState.Pose.Orientation;
+        UpdatePose();
+    }
+
+    void UpdatePose() {
+        OptitrackRigidBodyState rbState = StreamingClient.GetLatestRigidBodyState(RigidBodyId);
+        if (rbState != null) {
+            this.transform.localPosition = Vector3.Lerp(transform.localPosition, rbState.Pose.Position.V3, Time.deltaTime * lerpSpeed);
+            //			this.transform.localPosition = rbState.Pose.Position.V3;
+            this.transform.localRotation = Quaternion.Lerp(transform.rotation, rbState.Pose.Orientation.Q, Time.deltaTime * lerpSpeed);
+            //           this.transform.localRotation = rbState.Pose.Orientation.Q;
         }
     }
 }
