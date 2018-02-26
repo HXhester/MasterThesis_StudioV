@@ -4719,7 +4719,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c2b2e2f73a1674b941f5e85b274a5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LerpRate: 42
+  lerpRate: 1.5
+  _playerPhotonView: {fileID: 0}
   origHeadToEyeVector: {x: 0, y: 0, z: 0}
 --- !u!114 &114358714743406688
 MonoBehaviour:
@@ -4842,7 +4843,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Camera: {fileID: 0}
   localOptitrackAnimator: {fileID: 114010741644654252}
-  remoteOptitrackAnimator: {fileID: 0}
+  remoteOptitrackAnimator: {fileID: 114358714743406688}
   OptitrackHead: {fileID: 4337586498124588}
 --- !u!137 &137087318536548626
 SkinnedMeshRenderer:
