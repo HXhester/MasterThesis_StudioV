@@ -27,13 +27,16 @@ public class PlayerManager : Photon.PunBehaviour
         {
 			localOptitrackAnimator.gameObject.SetActive(true);
 			remoteOptitrackAnimator.gameObject.SetActive(false);
+            var cameraRig = GameObject.Find("[CameraRig]").transform;
             try
             {
-                Camera = GameObject.Find("[CameraRig]").transform.Find("Camera (eye)").gameObject;
+                Camera = cameraRig.Find("Camera (head)").Find("Camera (eye)").gameObject;
+                //listener = cameraRig.Find("Camera (head)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
-            catch
+            catch (System.Exception)
             {
-                Debug.LogWarning("PlayerManager.cs: No HMD detected");
+                Camera = cameraRig.Find("Camera (eye)").gameObject;
+                //listener = cameraRig.Find("Camera (eye)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
 
             Camera.GetComponent<SteamVR_Camera>().enabled = true;

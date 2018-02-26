@@ -2,48 +2,72 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SetHeadPos : Photon.MonoBehaviour {
-	private Transform _cameraEye;
-//	public Transform remoteCameraEye;
-	public float LerpRate = 42.0f;
+public class SetHeadPos : NetworkedPositionSmoothening {
+    [HideInInspector] public PhotonView _playerPhotonView;
+
+    private Transform CameraEye;
+    //	public Transform remoteCameraEye;
+    //	public float lerpRate = 42.0f;
 
     private Vector3 headToEyeVector;
-	public Vector3 origHeadToEyeVector;
+    public Vector3 origHeadToEyeVector;
     private Vector3 origRotation;
-    private Vector3 origHeadScale;
 
-	// Use this for initialization
-	void Awake()
-	{
+    void Awake()
+    {
+        _playerPhotonView = transform.parent.GetComponent<PhotonView>();
+    }
 
-	    origHeadScale = transform.localScale;
+    void Start()
+    {
+        if (_playerPhotonView.isMine)
+        {
+            CameraEye = transform.parent.GetComponent<PlayerManager>().Camera.transform;
+            //origHeadToEyeVector = -transform.position;
+            origHeadToEyeVector = new Vector3(0, 0.118f, 0.15f);
+            headToEyeVector = origHeadToEyeVector;
+            origRotation = transform.localEulerAngles;
 
-	}
-	void Start ()
-	{
-	    _cameraEye = transform.parent.GetComponent<PlayerManager>().Camera.transform;
-        origHeadToEyeVector = - transform.position;
-		headToEyeVector = origHeadToEyeVector;
-		origRotation = transform.localEulerAngles;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        if(_cameraEye==null)
-            return;
-	    
-		Vector3 newPos;
-		Vector3 rot = _cameraEye.localEulerAngles;
-		headToEyeVector = Quaternion.Euler (rot.x, rot.y, rot.z) * headToEyeVector;
+            //Scale HMD Head to 0 on local Avatars
+            transform.localScale = new Vector3(0, 0, 0);
+            foreach (Transform t in transform)
+            {
+                t.gameObject.SetActive(false);
+            }
+        }
 
-        newPos = _cameraEye.position - headToEyeVector;
+        //Why was this code commented out?
+        /* 
+		if (GameManager.Instance.localAvatar == null || GameManager.Instance.localAvatar == _playerPhotonView.gameObject) {
+			// scale hmd head to 0 for every client except the Avatars with a remoteAvatar
+			transform.localScale = new Vector3(0, 0, 0);
+			foreach(Transform t in transform){
+				t.gameObject.SetActive (false);
+			}
+		}*/
+    }
 
-        transform.position = Vector3.Lerp(transform.position, newPos, Time.deltaTime * LerpRate);
+    public override void Update()
+    {
+        if (_playerPhotonView.isMine)
+        {
+            //			Vector3 newPos;
+            Vector3 rot = CameraEye.localEulerAngles;
+            headToEyeVector = Quaternion.Euler(rot.x, rot.y, rot.z) * headToEyeVector;
 
-		transform.localEulerAngles = origRotation;
-		transform.Rotate (_cameraEye.localEulerAngles);
+            newPos = CameraEye.position - headToEyeVector;
 
-	    headToEyeVector = origHeadToEyeVector;
+            transform.position = Vector3.Lerp(transform.position, newPos, Time.deltaTime * lerpRate);
 
-	}
+            transform.localEulerAngles = origRotation;
+            transform.Rotate(CameraEye.localEulerAngles);
+
+            headToEyeVector = origHeadToEyeVector;
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, newPos, Time.deltaTime * lerpRate);
+            transform.rotation = Quaternion.Lerp(transform.rotation, newRot, Time.deltaTime * lerpRate);
+        }
+    }
 }
