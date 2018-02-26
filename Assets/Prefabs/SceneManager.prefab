@@ -70,6 +70,9 @@ MonoBehaviour:
   CurrentDistance: 0
   HasStarted: 0
   CountDownTime: 10
+  ChangeWordKey: 32
+  ReStartKey: 114
+  ChangeRatingQuestionKey: 113
 --- !u!114 &114868905566616462
 MonoBehaviour:
   m_ObjectHideFlags: 1

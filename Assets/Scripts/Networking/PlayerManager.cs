@@ -135,9 +135,9 @@ public class PlayerManager : Photon.PunBehaviour
         pm.localOptitrackAnimator.enabled = true;
         pm.remoteOptitrackAnimator.enabled = true;
 
-        GameObject.FindGameObjectWithTag("AvatarAndSceneManager")
-            .GetComponent<AvatarAndSceneManagerScript>()
-            .spawnedResources.Add(new SpawnedResource(skeletonName, gameObjectName));
+        //GameObject.FindGameObjectWithTag("AvatarAndSceneManager")
+        //    .GetComponent<AvatarAndSceneManagerScript>()
+        //    .spawnedResources.Add(new SpawnedResource(skeletonName, gameObjectName));
     }
 
     [PunRPC]
