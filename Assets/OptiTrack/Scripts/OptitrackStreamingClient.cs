@@ -562,7 +562,7 @@ public class OptitrackStreamingClient : Photon.MonoBehaviour
 //			Debug.LogException( ex, this );
 //			Debug.LogError( GetType().FullName + ": Error connecting to server; check your configuration, and make sure the server is currently streaming.", this );
 			//Add Call to fallback, giving an error message
-			Fallback.Instance.SendErrorMessage("Couldn't connect to motive. Make sure Motive has started and then relaunch playmode");
+			//Fallback.Instance.SendErrorMessage("Couldn't connect to motive. Make sure Motive has started and then relaunch playmode");
 			this.enabled = false;
 			return;
 		}
