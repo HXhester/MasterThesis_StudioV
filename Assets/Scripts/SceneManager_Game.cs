@@ -114,8 +114,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             {
                 StopGame();
                 AssignDistancesOnRopes();
-                // TODO: change to photonview.rpc call
-                RPC_ShowRatingUI(_inGameRatingUI,0);
+                photonView.RPC("RPC_ShowRatingUI", PhotonTargets.All, _inGameRatingUI, 0);
             }
             else if (Input.GetKeyDown(ChangeWordKey))
             {
@@ -139,9 +138,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 StartGame();
             } else if (Input.GetKeyDown(ChangeRatingQuestionKey))
             {
-                //TODO: change to photonview.rpc call
-                RPC_ShowRatingUI(_inGameRatingUI,1);
-                //photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,_inGameRatingUI,1);
+                photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,_inGameRatingUI,1);
             }
             else if (_avatarHeads != null)
             {
@@ -178,9 +175,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
     // Call on start experiment game "20 Questions"
     public void StartGame()
     {
-        // TODO: uncomment photonview line and recording manager line
-        //photonView.RPC("RPC_StartGame", PhotonTargets.All);
-        RPC_StartGame(_inGameRatingUI);
+        photonView.RPC("RPC_StartGame", PhotonTargets.All);
+        //RPC_StartGame(_inGameRatingUI);
         _recordingManager.StartRecording();
 
         Debug.Log("20 Questions game Start!");
@@ -189,8 +185,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public void StopGame()
     {
         // TODO: uncomment this line
-        //photonView.RPC("RPC_StopGame", PhotonTargets.All);
-        RPC_StopGame();
+        photonView.RPC("RPC_StopGame", PhotonTargets.All);
+        //RPC_StopGame();
 
         _recordingManager.StopRecording();
         Debug.Log("20 Questions game Stop!");
@@ -217,8 +213,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
     // Call on space key press during "20 Questions"
     public void AssignWordsOnBoards()
     {
-        RPC_AssignWordsOnBoards(_wordID, _wordList[_wordID]);
-        //photonView.RPC("RPC_AssignWordsOnBoards",PhotonTargets.All,_wordID,_wordList[_wordID]);
+        //RPC_AssignWordsOnBoards(_wordID, _wordList[_wordID]);
+        photonView.RPC("RPC_AssignWordsOnBoards",PhotonTargets.All,_wordID,_wordList[_wordID]);
     }
 
     public void AssignDistancesOnRopes()
@@ -227,8 +223,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
         {
             float distance = float.Parse(_distanceList[_distanceID]);
             CurrentDistance = distance;
-            RPC_AssignDistancesOnRopes(distance);
-            //photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All);
+            //RPC_AssignDistancesOnRopes(distance);
+            photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All);
             _distanceID++;
         }else
         {
