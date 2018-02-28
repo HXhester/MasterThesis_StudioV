@@ -14,7 +14,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private GameObject _board2;
     private GameObject _rope1;
     private GameObject _rope2;
-    private GameObject[] _avatarHeads;
+    private List<GameObject> _avatarHeads;
     private GameObject[] _inGameRatingUI;
     private GameObject _screenUI;
 
@@ -40,6 +40,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
     void Start () {
         _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
+        _avatarHeads = new List<GameObject>();
 
         _Timer = GameObject.Find("CountDownTimer").GetComponent<Text>();
         _Timer.gameObject.SetActive(false);
@@ -137,7 +138,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             }
             else if (_avatarHeads != null)
             {
-                if (_avatarHeads.Length != 2)
+                if (_avatarHeads.Count != 2)
                 {
                     Debug.Log("Waiting for more avatars to join");                    
                 }
@@ -257,14 +258,22 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     IEnumerator LookingForAvatars() {
-        while (_avatarHeads.Length != 2) {
+        while (_avatarHeads.Count != 2) {
+            _avatarHeads.Clear();
             if (GameManager.Instance.UsingVR)
             {
-                _avatarHeads = GameObject.FindGameObjectsWithTag("HMDHead");
+                var avatars = GameObject.FindGameObjectsWithTag("HMDHead");
+                foreach (GameObject a in avatars) {
+                    _avatarHeads.Add(a);
+                }
             }
             else
             {
-                _avatarHeads = GameObject.FindGameObjectsWithTag("OptitrackHead");
+                var avatars = GameObject.FindGameObjectsWithTag("OptitrackHead");
+                foreach (GameObject a in avatars)
+                {
+                    _avatarHeads.Add(a);
+                }
             }
             yield return new WaitForEndOfFrame();
         }
