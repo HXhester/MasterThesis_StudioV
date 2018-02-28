@@ -106,10 +106,5 @@ namespace Com.MTGTech.MyGame{
 				}
 			}
 		}
-
-        [PunRPC]
-        void RPC_SetVRMode(bool isUsingVR) {
-            GameManager.Instance.UsingVR = isUsingVR;
-        }
 	}
 }

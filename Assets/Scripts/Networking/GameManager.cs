@@ -150,5 +150,8 @@ public class GameManager : Photon.PunBehaviour
 		pv.RPC ("SetParent", PhotonTargets.AllBuffered, player.name);
 	}
 
-			
+    [PunRPC]
+    void RPC_SetVRMode(bool isUsingVR) {
+        Instance.UsingVR = isUsingVR;
+    }
 }

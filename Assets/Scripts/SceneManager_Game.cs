@@ -263,7 +263,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             if (GameManager.Instance.UsingVR)
             {
                 var avatars = GameObject.FindGameObjectsWithTag("HMDHead");
-                Debug.Log(avatars.Length);
+                
                 foreach (GameObject a in avatars) {
                     _avatarHeads.Add(a);
                 }
