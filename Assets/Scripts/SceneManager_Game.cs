@@ -178,7 +178,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     // Call on start experiment game "20 Questions"
     public void StartGame()
     {
-        photonView.RPC("RPC_StartGame", PhotonTargets.All);
+        photonView.RPC("RPC_StartGame", PhotonTargets.All,_inGameRatingUI);
         //RPC_StartGame(_inGameRatingUI);
         _recordingManager.StartRecording();
 
