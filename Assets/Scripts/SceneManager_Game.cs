@@ -111,7 +111,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             {
                 StopGame();
                 AssignDistancesOnRopes();
-                photonView.RPC("RPC_ShowRatingUI", PhotonTargets.All, _inGameRatingUI, 0);
+                photonView.RPC("RPC_ShowRatingUI", PhotonTargets.All, 0);
             }
             else if (Input.GetKeyDown(ChangeWordKey))
             {
@@ -135,7 +135,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 StartGame();
             } else if (Input.GetKeyDown(ChangeRatingQuestionKey))
             {
-                photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,_inGameRatingUI,1);
+                photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,1);
             }
             else if (_avatarHeads != null)
             {
@@ -178,7 +178,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     // Call on start experiment game "20 Questions"
     public void StartGame()
     {
-        photonView.RPC("RPC_StartGame", PhotonTargets.All,_inGameRatingUI);
+        photonView.RPC("RPC_StartGame", PhotonTargets.All);
         //RPC_StartGame(_inGameRatingUI);
         _recordingManager.StartRecording();
 
@@ -196,14 +196,14 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     [PunRPC]
-    void RPC_StartGame(GameObject[] ratingUI)
+    void RPC_StartGame()
     {
         FindObjectOfType<SceneManager_Game>().HasStarted = true;
         FindObjectOfType<SceneManager_Game>().currentCountDown = FindObjectOfType<SceneManager_Game>().CountDownTime;
         GameObject.Find("StartButton").GetComponent<Button>().interactable = false;
 
-        ratingUI[0].SetActive(false);
-        ratingUI[1].SetActive(false);
+        _inGameRatingUI[0].SetActive(false);
+        _inGameRatingUI[1].SetActive(false);
     }
 
     [PunRPC]
@@ -261,10 +261,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     [PunRPC]
-    void RPC_ShowRatingUI(GameObject[] ratingUI, int index)
+    void RPC_ShowRatingUI(int index)
     {
-        ratingUI[index].gameObject.SetActive(true);
-        ratingUI[1-index].gameObject.SetActive(false);
+        _inGameRatingUI[index].gameObject.SetActive(true);
+        _inGameRatingUI[1-index].gameObject.SetActive(false);
     }
 
     public IEnumerator LookingForAvatars() {
