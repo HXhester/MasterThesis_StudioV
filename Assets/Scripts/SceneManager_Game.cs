@@ -167,6 +167,9 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.L))
         {
+            if(_avatarHeads!=null)
+                _avatarHeads.Clear();
+
             StartCoroutine(LookingForAvatars());
         }
             
@@ -224,7 +227,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             float distance = float.Parse(_distanceList[_distanceID]);
             CurrentDistance = distance;
             //RPC_AssignDistancesOnRopes(distance);
-            photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.All,distance);
+            photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.AllBuffered,distance);
             _distanceID++;
         }else
         {
