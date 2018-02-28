@@ -63,7 +63,10 @@ namespace Com.MTGTech.MyGame{
 		{
 			PhotonNetwork.LoadLevel (sceneToLoadText.text);
 		    GameManager.Instance.DyadType = DyadTypeText.text;
-		    GameManager.Instance.UsingVR = isUsingVR.isOn;
+            if (PhotonNetwork.isMasterClient) {
+                photonView.RPC("RPC_SetVRMode", PhotonTargets.AllBuffered, isUsingVR.isOn);
+            }
+            
             if (!string.IsNullOrEmpty(skeletonName.text)) {
                 PlayerPrefs.SetString("SkeletonName", skeletonName.text);
             }
@@ -103,5 +106,10 @@ namespace Com.MTGTech.MyGame{
 				}
 			}
 		}
+
+        [PunRPC]
+        void RPC_SetVRMode(bool isUsingVR) {
+            GameManager.Instance.UsingVR = isUsingVR;
+        }
 	}
 }
