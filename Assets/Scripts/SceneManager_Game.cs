@@ -156,24 +156,16 @@ public class SceneManager_Game : Photon.MonoBehaviour
                         _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;
                         _hasSetAvatars = true;
                     }
+        
+                    var distToRope1 = (_avatarHeads[0].transform.position.x - _rope1.transform.position.x).ToString("0.00");
+                    _board2.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope1 + "m";
 
-                    foreach (GameObject avatar in _avatarHeads)
-                    {
-                        if (avatar.transform.position.x > 0)
-                        {
-                            var distToRope = (avatar.transform.position.x - _rope2.transform.position.x).ToString("0.00");
-                            _board1.GetComponent<Text>().text =
-                                "Please adjust your position to the red rope. Your distance to the rope is: " +
-                                distToRope + "m";
-                        }
-                        else
-                        {
-                            var distToRope = (avatar.transform.position.x - _rope1.transform.position.x).ToString("0.00");
-                            _board2.GetComponent<Text>().text =
-                                "Please adjust your position to the red rope. Your distance to the rope is: " +
-                                distToRope + "m";
-                        }
-                    }
+                    var distToRope2 = (_avatarHeads[1].transform.position.x - _rope2.transform.position.x).ToString("0.00");
+                    _board1.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope2 + "m";
                 }
             }
         }
