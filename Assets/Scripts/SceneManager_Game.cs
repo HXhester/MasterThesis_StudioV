@@ -32,6 +32,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public KeyCode ChangeWordKey = KeyCode.Space;
     public KeyCode ReStartKey = KeyCode.R;
     public KeyCode ChangeRatingQuestionKey = KeyCode.Q;
+    public KeyCode LookForAvatarsKey = KeyCode.L;
 
     private bool _hasSetAvatars;
 
@@ -163,6 +164,12 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            StartCoroutine(LookingForAvatars());
+        }
+            
     }
 
     // Call on start experiment game "20 Questions"
@@ -257,7 +264,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         ratingUI[1-index].gameObject.SetActive(false);
     }
 
-    IEnumerator LookingForAvatars() {
+    public IEnumerator LookingForAvatars() {
         while (_avatarHeads.Count != 2) {
             _avatarHeads.Clear();
             if (GameManager.Instance.UsingVR)
