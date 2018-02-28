@@ -50,14 +50,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         _rope1 = GameObject.FindGameObjectWithTag("Rope1");
         _rope2 = GameObject.FindGameObjectWithTag("Rope2");
 
-        if (GameManager.Instance.UsingVR)
-        {
-            _avatarHeads = GameObject.FindGameObjectsWithTag("HMDHead");
-        }
-        else
-        {
-            _avatarHeads = GameObject.FindGameObjectsWithTag("OptitrackHead");
-        }
+        StartCoroutine(LookingForAvatars());
         
         _randomizeManager = GetComponent<RandomizeWords>();
 
@@ -263,4 +256,20 @@ public class SceneManager_Game : Photon.MonoBehaviour
         ratingUI[1-index].gameObject.SetActive(false);
     }
 
+    IEnumerator LookingForAvatars() {
+        while (_avatarHeads.Length != 2) {
+            if (GameManager.Instance.UsingVR)
+            {
+                _avatarHeads = GameObject.FindGameObjectsWithTag("HMDHead");
+            }
+            else
+            {
+                _avatarHeads = GameObject.FindGameObjectsWithTag("OptitrackHead");
+            }
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield break;
+    }
+    
 }
