@@ -217,7 +217,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public void AssignWordsOnBoards()
     {
         //RPC_AssignWordsOnBoards(_wordID, _wordList[_wordID]);
-        photonView.RPC("RPC_AssignWordsOnBoards",PhotonTargets.All,_wordID,_wordList[_wordID]);
+        photonView.RPC("RPC_AssignWordsOnBoards",PhotonTargets.All,_wordID,_wordList[_wordID],_categoryWordDict[_wordList[_wordID]]);
     }
 
     public void AssignDistancesOnRopes()
@@ -236,18 +236,18 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     [PunRPC]
-    void RPC_AssignWordsOnBoards(int wordID, string word)
+    void RPC_AssignWordsOnBoards(int wordID, string word,string category)
     {
         Debug.Log("wordID:" + wordID);
         if (wordID%2 == 0)
         {
-            _board1.GetComponent<Text>().text = _categoryWordDict[word] + ":" + word;
+            _board1.GetComponent<Text>().text = category + ":" + word;
             _board2.GetComponent<Text>().text = "It's your turn to guess.";
         }
         else
         {         
             _board1.GetComponent<Text>().text = "It's your turn to guess.";
-            _board2.GetComponent<Text>().text = _categoryWordDict[word] + ":" + word;
+            _board2.GetComponent<Text>().text = category + ":" + word;
         }
     }
 
