@@ -151,16 +151,35 @@ public class SceneManager_Game : Photon.MonoBehaviour
                         _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;
                         _hasSetAvatars = true;
                     }
-        
-                    var distToRope1 = (_avatarHeads[0].transform.position.x - _rope1.transform.position.x).ToString("0.00");
-                    _board2.GetComponent<Text>().text =
-                        "Please adjust your position to the red rope. Your distance to the rope is: " +
-                        distToRope1 + "m";
 
-                    var distToRope2 = (_avatarHeads[1].transform.position.x - _rope2.transform.position.x).ToString("0.00");
-                    _board1.GetComponent<Text>().text =
-                        "Please adjust your position to the red rope. Your distance to the rope is: " +
-                        distToRope2 + "m";
+                    var dist1 = _avatarHeads[0].transform.position.x - _rope1.transform.position.x;
+                    var dist2 = _avatarHeads[1].transform.position.x - _rope1.transform.position.x;
+
+                    if (dist1 < dist2)
+                    {
+                        var distToRope1Str = dist1.ToString("0.00");
+                        _board2.GetComponent<Text>().text =
+                            "Please adjust your position to the red rope. Your distance to the rope is: " +
+                            distToRope1Str + "m";
+
+                        var distToRope2Str = (_avatarHeads[1].transform.position.x - _rope2.transform.position.x).ToString("0.00");
+                        _board1.GetComponent<Text>().text =
+                            "Please adjust your position to the red rope. Your distance to the rope is: " +
+                            distToRope2Str + "m";
+                    }
+                    else {
+                        var distToRope1Str = dist2.ToString("0.00");
+                        _board2.GetComponent<Text>().text =
+                            "Please adjust your position to the red rope. Your distance to the rope is: " +
+                            distToRope1Str + "m";
+
+                        var distToRope2Str = (_avatarHeads[0].transform.position.x - _rope2.transform.position.x).ToString("0.00");
+                        _board1.GetComponent<Text>().text =
+                            "Please adjust your position to the red rope. Your distance to the rope is: " +
+                            distToRope2Str + "m";
+                    }
+
+                    
                 }
             }
         }
