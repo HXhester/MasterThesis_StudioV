@@ -76,4 +76,5 @@ MonoBehaviour:
   - RPC_ShowRatingUI
   - RPC_TriggerUpdateDefinitions
   - RPC_UpdateDefinitions
+  - RPC_SetVRMode
   DisableAutoOpenWizard: 1
