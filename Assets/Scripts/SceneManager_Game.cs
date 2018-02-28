@@ -106,26 +106,27 @@ public class SceneManager_Game : Photon.MonoBehaviour
             _Timer.gameObject.SetActive(true);
             _Timer.text = currentCountDown.ToString("0.00");
 
-            //if (PhotonNetwork.isMasterClient)
-            if (currentCountDown <= 0)
-            {
-                StopGame();
-                AssignDistancesOnRopes();
-                photonView.RPC("RPC_ShowRatingUI", PhotonTargets.All, 0);
-            }
-            else if (Input.GetKeyDown(ChangeWordKey))
-            {
-                if (_wordID < _wordList.Length)
+            if (PhotonNetwork.isMasterClient) {
+                if (currentCountDown <= 0)
                 {
-                    AssignWordsOnBoards();
-                    _wordID++;
+                    StopGame();
+                    AssignDistancesOnRopes();
+                    photonView.RPC("RPC_ShowRatingUI", PhotonTargets.All, 0);
                 }
-                else
+                else if (Input.GetKeyDown(ChangeWordKey))
                 {
-                    Debug.LogWarning("Run out of word list! Resetting wordID to 0.");
-                    _wordID = 0;
+                    if (_wordID < _wordList.Length)
+                    {
+                        AssignWordsOnBoards();
+                        _wordID++;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Run out of word list! Resetting wordID to 0.");
+                        _wordID = 0;
+                    }
                 }
-            }
+            }            
         }
         else
         {
