@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tobii.Research.Unity.CodeExamples;
 
+[DisallowMultipleComponent]
 public class EyeRaycaster : MonoBehaviour {
 
     //public float m_RayLength;

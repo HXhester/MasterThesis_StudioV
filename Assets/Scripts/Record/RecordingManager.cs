@@ -72,12 +72,16 @@ public class RecordingManager : Photon.PunBehaviour {
                 _2Avatars = true;
                 if (GameManager.Instance.UsingVR)
                 {
-                    _eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
+                    _eyes = GameObject.FindGameObjectsWithTag("EyeMesh");                   
                 }
                 else
                 {
                     _eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
-                }               
+                }
+
+                foreach (GameObject eye in _eyes) {
+                    eye.AddComponent<EyeRaycaster>();
+                }
             }           
         }
     }
