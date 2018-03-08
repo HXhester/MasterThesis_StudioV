@@ -13,10 +13,10 @@ public class RecordingManager : Photon.PunBehaviour {
 
     private string _eyeFilename;
     private StreamWriter sw_eye;
-    private GameObject[]  _eyes;            // Left eye gameobjects on avatars    
+    public GameObject[]  Eyes;            // Left eye gameobjects on avatars    
     private WorldTimer _worldTimer;
     private bool _isMutualGazeInLastFrame;
-    private bool _2Avatars;
+    public bool AvatarsReady;
 
     [HideInInspector]
     public bool IsRecording = false;
@@ -26,15 +26,15 @@ public class RecordingManager : Photon.PunBehaviour {
         _worldTimer = GetComponent<WorldTimer>();
         if (PhotonNetwork.isMasterClient)
         {
-            _eyes = new GameObject[2];
+            Eyes = new GameObject[2];
         }       
     }
 
     // Update is called once per frame
     void Update () {
-        if (PhotonNetwork.isMasterClient && _2Avatars)
+        if (PhotonNetwork.isMasterClient && AvatarsReady)
         {
-            if (!_isMutualGazeInLastFrame && IsMutualGaze(_eyes[0], _eyes[1]))
+            if (!_isMutualGazeInLastFrame && IsMutualGaze(Eyes[0], Eyes[1]))
             {
                 if (IsRecording)
                 {
@@ -42,7 +42,7 @@ public class RecordingManager : Photon.PunBehaviour {
                     Debug.Log("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
                 }
             }
-            else if(_isMutualGazeInLastFrame && !IsMutualGaze(_eyes[0], _eyes[1]))
+            else if(_isMutualGazeInLastFrame && !IsMutualGaze(Eyes[0], Eyes[1]))
             {
                 if (IsRecording)
                 {
@@ -50,7 +50,7 @@ public class RecordingManager : Photon.PunBehaviour {
                 }
             }
 
-            _isMutualGazeInLastFrame = IsMutualGaze(_eyes[0], _eyes[1]);
+            _isMutualGazeInLastFrame = IsMutualGaze(Eyes[0], Eyes[1]);
         }
     }
 
@@ -61,34 +61,34 @@ public class RecordingManager : Photon.PunBehaviour {
             StopRecording();    
     }
 
-    public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
-    {
-        if (PhotonNetwork.isMasterClient)
-        {
-            Debug.Log("is master client, a player is connected");
-            var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-            if (avatars.Length == 2)
-            {
-                _2Avatars = true;
-                if (GameManager.Instance.UsingVR)
-                {
-                    _eyes = GameObject.FindGameObjectsWithTag("EyeMesh");                   
-                }
-                else
-                {
-                    _eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
-                }
+    //public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+    //{
+    //    if (PhotonNetwork.isMasterClient)
+    //    {
+    //        Debug.Log("is master client, a player is connected");
+    //        var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+    //        if (avatars.Length == 2)
+    //        {
+    //            _2Avatars = true;
+    //            if (GameManager.Instance.UsingVR)
+    //            {
+    //                _eyes = GameObject.FindGameObjectsWithTag("EyeMesh");                   
+    //            }
+    //            else
+    //            {
+    //                _eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
+    //            }
 
-                foreach (GameObject eye in _eyes) {
-                    eye.AddComponent<EyeRaycaster>();
-                }
-            }           
-        }
-    }
+    //            foreach (GameObject eye in _eyes) {
+    //                eye.AddComponent<EyeRaycaster>();
+    //            }
+    //        }           
+    //    }
+    //}
 
     public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
     {
-        _2Avatars = false;
+        AvatarsReady = false;
     }
 
 

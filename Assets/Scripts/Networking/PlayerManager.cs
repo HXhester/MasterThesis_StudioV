@@ -76,18 +76,33 @@ public class PlayerManager : Photon.PunBehaviour
         // Master client should have HMD avatar enable to collect correct data
         if (PhotonNetwork.isMasterClient)
         {
-
+            var eyes = new GameObject[2];
             if (GameManager.Instance.UsingVR)
             {
                 localOptitrackAnimator.gameObject.SetActive(true);
                 remoteOptitrackAnimator.gameObject.SetActive(false);
+
+                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");              
             }
             else
             {
                 localOptitrackAnimator.gameObject.SetActive(false);
                 GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
+
+                eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");               
             }
+
+            if (eyes.Length == 2) {
+                Debug.Log("find eyes");
+                FindObjectOfType<RecordingManager>().Eyes = eyes;
+                FindObjectOfType<RecordingManager>().AvatarsReady = true;
+
+                foreach (GameObject eye in eyes) {
+                    eye.AddComponent<EyeRaycaster>();
+                }
+            }
+               
         }  
     }
 
