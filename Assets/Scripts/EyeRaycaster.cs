@@ -26,7 +26,8 @@ public class EyeRaycaster : MonoBehaviour {
 
         if (rayToggler)
         {
-            Debug.DrawRay(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection, Color.blue);
+            //Debug.DrawRay(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection*1000f, Color.blue);
+            Debug.DrawRay(transform.position, transform.forward*10f, Color.blue);
         }        
     }
 
