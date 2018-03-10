@@ -24,6 +24,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private int _wordID;
     private int _distanceID;
 
+    public Text DistanceText;
     public float CurrentDistance;
     public bool HasStarted = false;  
     public float CountDownTime = 7f;   // Using count down 3min, 180s
@@ -246,6 +247,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         {
             float distance = float.Parse(_distanceList[_distanceID]);
             CurrentDistance = distance;
+            DistanceText.text = "Current distance is: " + distance;
             //RPC_AssignDistancesOnRopes(distance);
             photonView.RPC("RPC_AssignDistancesOnRopes", PhotonTargets.AllBuffered,distance);
             _distanceID++;
