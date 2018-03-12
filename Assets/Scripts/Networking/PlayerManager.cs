@@ -18,10 +18,13 @@ public class PlayerManager : Photon.PunBehaviour
     public OptitrackSkeletonAnimator remoteOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
     public Transform OptitrackHead;
 
+    private GameObject[] eyes;
+    private GameObject[] eyeOrigs;
     void Awake()
     {
         gameObject.name += photonView.viewID.ToString();
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
+
         //If the spawned avatar is mine
         if (photonView.isMine)
         {
@@ -76,7 +79,6 @@ public class PlayerManager : Photon.PunBehaviour
         // Master client should have HMD avatar enable to collect correct data
         if (PhotonNetwork.isMasterClient)
         {
-            var eyes = new GameObject[2];
             if (GameManager.Instance.UsingVR)
             {
                 localOptitrackAnimator.gameObject.SetActive(true);
@@ -95,15 +97,33 @@ public class PlayerManager : Photon.PunBehaviour
 
             if (eyes.Length == 2) {
                 Debug.Log("find eyes");
-                FindObjectOfType<RecordingManager>().Eyes = eyes;
-                FindObjectOfType<RecordingManager>().AvatarsReady = true;
 
-                foreach (GameObject eye in eyes) {
-                    eye.AddComponent<EyeRaycaster>();
+                eyeOrigs = new GameObject[2];
+                for(int i=0; i<eyes.Length;i++) {
+
+                    var eyeOrig = new GameObject("EyeOrig");
+                    eyeOrig.transform.SetParent(eyes[i].transform.parent);
+                    if (GameManager.Instance.UsingVR)
+                        eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
+
+                    eyeOrigs[i] = eyeOrig;
+
+                    var raycaster = eyes[i].AddComponent<EyeRaycaster>();
+                    raycaster.eyeOrig = eyeOrig;
                 }
-            }
-               
+
+                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;
+                FindObjectOfType<RecordingManager>().AvatarsReady = true;
+            }             
         }  
+    }
+
+    void Update()
+    {
+        for (int i = 0; i < eyes.Length; i++)
+        {
+            eyeOrigs[i].transform.rotation = eyes[i].transform.rotation;
+        }
     }
 
     //This method is only called by Avatars

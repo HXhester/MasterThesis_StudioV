@@ -40,6 +40,7 @@ public class RecordingManager : Photon.PunBehaviour {
                 {
                     sw_eye.WriteLine("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
                     Debug.Log("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
+                    //Debug.Log("Mutual gaze starts," + Time.time);
                 }
             }
             else if(_isMutualGazeInLastFrame && !IsMutualGaze(Eyes[0], Eyes[1]))
@@ -47,6 +48,8 @@ public class RecordingManager : Photon.PunBehaviour {
                 if (IsRecording)
                 {
                     sw_eye.WriteLine("Mutual gaze ends," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
+                    Debug.Log("Mutual gaze ends," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
+                    //Debug.Log("Mutual gaze ends," + Time.time);
                 }
             }
 
@@ -60,31 +63,6 @@ public class RecordingManager : Photon.PunBehaviour {
         if (IsRecording)
             StopRecording();    
     }
-
-    //public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
-    //{
-    //    if (PhotonNetwork.isMasterClient)
-    //    {
-    //        Debug.Log("is master client, a player is connected");
-    //        var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-    //        if (avatars.Length == 2)
-    //        {
-    //            _2Avatars = true;
-    //            if (GameManager.Instance.UsingVR)
-    //            {
-    //                _eyes = GameObject.FindGameObjectsWithTag("EyeMesh");                   
-    //            }
-    //            else
-    //            {
-    //                _eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
-    //            }
-
-    //            foreach (GameObject eye in _eyes) {
-    //                eye.AddComponent<EyeRaycaster>();
-    //            }
-    //        }           
-    //    }
-    //}
 
     public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
     {
@@ -107,20 +85,23 @@ public class RecordingManager : Photon.PunBehaviour {
         sw_eye = new StreamWriter(_eyeFilename);
 
         IsRecording = true;
-        GetComponent<WorldTimer>().StartTimer();
+        _worldTimer.StartTimer();
+        sw_eye.WriteLine("Start recording," + _worldTimer.ElapsedTimeSinceStart);
     }
 
 
     public void StopRecording()
     {     
         IsRecording = false;
-        GetComponent<WorldTimer>().StopTimer();
-        GetComponent<WorldTimer>().ResetTimer();
-
+        
         if (sw_eye != null)
         {
+            sw_eye.WriteLine("Stop recording," + _worldTimer.ElapsedTimeSinceStart);
             sw_eye.Close();
-        }       
+        }
+
+        GetComponent<WorldTimer>().StopTimer();
+        GetComponent<WorldTimer>().ResetTimer();
     }
 
     bool IsMutualGaze(GameObject eye1, GameObject eye2)
@@ -135,7 +116,7 @@ public class RecordingManager : Photon.PunBehaviour {
         eye1ToEye2Dir = eye2.transform.position - eye1.transform.position;
         float angle1 = Vector3.Angle(gazeDirection1, eye1ToEye2Dir);
         float angle2 = Vector3.Angle(gazeDirection2, -eye1ToEye2Dir);
-
+       
         return (Mathf.Abs(angle1) < 9f) && (Mathf.Abs(angle2) < 9f);
     }
 }
