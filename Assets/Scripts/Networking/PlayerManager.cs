@@ -91,6 +91,8 @@ public class PlayerManager : Photon.PunBehaviour
                 localOptitrackAnimator.gameObject.SetActive(false);
                 GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
+                GetComponent<FaceExpressionController>().enabled = false;
+                GetComponent<EyeController>().enabled = false;
 
                 eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");               
             }
@@ -103,8 +105,12 @@ public class PlayerManager : Photon.PunBehaviour
 
                     var eyeOrig = new GameObject("EyeOrig");
                     eyeOrig.transform.SetParent(eyes[i].transform.parent);
-                    if (GameManager.Instance.UsingVR)
+                    if (GameManager.Instance.UsingVR) {
                         eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
+                    } else {
+                        eyeOrig.transform.localPosition = eyes[i].transform.localPosition;
+                    }
+                        
 
                     eyeOrigs[i] = eyeOrig;
 
