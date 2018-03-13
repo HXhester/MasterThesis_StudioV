@@ -91,7 +91,7 @@ public class PlayerManager : Photon.PunBehaviour
                 localOptitrackAnimator.gameObject.SetActive(false);
                 GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
-                GetComponent<FaceExpressionController>().enabled = false;
+                GetComponent <FacialController>().enabled = false;
                 GetComponent<EyeController>().enabled = false;
 
                 eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");               
