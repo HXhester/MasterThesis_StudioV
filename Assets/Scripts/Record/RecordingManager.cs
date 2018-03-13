@@ -87,6 +87,9 @@ public class RecordingManager : Photon.PunBehaviour {
         IsRecording = true;
         _worldTimer.StartTimer();
         sw_eye.WriteLine("Start recording," + _worldTimer.ElapsedTimeSinceStart);
+        if (IsMutualGaze(Eyes[0], Eyes[1])) {
+            sw_eye.WriteLine("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart);
+        }
     }
 
 
