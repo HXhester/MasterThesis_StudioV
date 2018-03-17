@@ -9,6 +9,7 @@ namespace Tobii.Research.Unity.CodeExamples
     // The events in the SDK are called on a thread internal to the SDK. That thread can not safely set values
     // that are to be read on the main thread. The simplest way to make it safe is to enqueue the date, and dequeue it
     // on the main thread, e.g. via Update() in a MonoBehaviour.
+    
 	public class SubscribingToHMDGazeData : MonoBehaviour
     {
         private IEyeTracker _eyeTracker;
@@ -28,6 +29,9 @@ namespace Tobii.Research.Unity.CodeExamples
 
         private static SubscribingToHMDGazeData _subscribingInstance;
 
+        private void Awake() {
+            DontDestroyOnLoad(gameObject);
+        }
         void Update()
         {
             PumpGazeData();
