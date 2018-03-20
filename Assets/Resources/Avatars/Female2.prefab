@@ -4753,7 +4753,10 @@ MonoBehaviour:
   eye_R: {fileID: 4095991461782730}
   r_eye_L: {fileID: 4007531122662204}
   r_eye_R: {fileID: 4344299000470772}
+  HmdFace: {fileID: 137489726997119908}
+  OptitrackFace: {fileID: 137767992135178532}
   EyeMoveLerpSpeed: 20
+  BlinkBlendSpeed: 4
 --- !u!114 &114418731200683452
 MonoBehaviour:
   m_ObjectHideFlags: 1

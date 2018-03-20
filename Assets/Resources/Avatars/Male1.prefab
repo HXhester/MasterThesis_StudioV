@@ -4715,7 +4715,10 @@ MonoBehaviour:
   eye_R: {fileID: 4193712491102674}
   r_eye_L: {fileID: 4992340054265140}
   r_eye_R: {fileID: 4656565340011398}
+  HmdFace: {fileID: 137120907729294516}
+  OptitrackFace: {fileID: 137298380666518240}
   EyeMoveLerpSpeed: 20
+  BlinkBlendSpeed: 4
 --- !u!114 &114286356685393460
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4742,7 +4745,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c2b2e2f73a1674b941f5e85b274a5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LerpRate: 42
+  lerpRate: 1.5
+  _playerPhotonView: {fileID: 0}
   origHeadToEyeVector: {x: 0, y: 0, z: 0}
 --- !u!114 &114508921943976008
 MonoBehaviour:
