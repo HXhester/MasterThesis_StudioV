@@ -21,7 +21,7 @@ public class RandomizeWords : MonoBehaviour
        
         if (Environment.CommandLine.Contains("Experiment"))
         {
-            using (StreamReader sr = new StreamReader(Application.streamingAssetsPath + "wordlist.txt"))
+            using (StreamReader sr = new StreamReader(Application.streamingAssetsPath + "/wordlist.txt"))
             {
                 string line;
                 string[] values;

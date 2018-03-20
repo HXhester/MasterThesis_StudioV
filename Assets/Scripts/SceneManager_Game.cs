@@ -149,6 +149,9 @@ public class SceneManager_Game : Photon.MonoBehaviour
                 {
                     if (!_hasSetAvatars) {
                         var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                        if(avatars.Length!=2)
+                            return;
+
                         if (GameManager.Instance.UsingVR) {
                             _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
                             _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
@@ -296,23 +299,33 @@ public class SceneManager_Game : Photon.MonoBehaviour
     }
 
     public IEnumerator LookingForAvatars() {
-        while (_avatarHeads.Count != 2) {
-            _avatarHeads.Clear();
+        while (_avatarHeads.Count != 2)
+        {
+            _hasSetAvatars = false;
+            //_avatarHeads.Clear();
             if (GameManager.Instance.UsingVR)
             {
                 var avatars = GameObject.FindGameObjectsWithTag("HMDHead");
-                
+                if(avatars.Length!=2)
+                    continue;
+
                 foreach (GameObject a in avatars) {
                     _avatarHeads.Add(a);
                 }
+
+                _hasSetAvatars = true;
             }
             else
             {
                 var avatars = GameObject.FindGameObjectsWithTag("OptitrackHead");
+                if (avatars.Length != 2)
+                    continue;
+
                 foreach (GameObject a in avatars)
                 {
                     _avatarHeads.Add(a);
                 }
+                _hasSetAvatars = true;
             }
             yield return new WaitForEndOfFrame();
         }

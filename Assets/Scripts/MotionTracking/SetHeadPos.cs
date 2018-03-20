@@ -23,8 +23,8 @@ public class SetHeadPos : NetworkedPositionSmoothening {
         if (_playerPhotonView.isMine)
         {
             CameraEye = transform.parent.GetComponent<PlayerManager>().Camera.transform;
-            //origHeadToEyeVector = -transform.position;
-            origHeadToEyeVector = new Vector3(0, 0.118f, 0.15f);
+            origHeadToEyeVector = -transform.position;
+            //origHeadToEyeVector = new Vector3(0, 0.118f, 0.15f);
             headToEyeVector = origHeadToEyeVector;
             origRotation = transform.localEulerAngles;
 
@@ -36,15 +36,6 @@ public class SetHeadPos : NetworkedPositionSmoothening {
             }
         }
 
-        //Why was this code commented out?
-        /* 
-		if (GameManager.Instance.localAvatar == null || GameManager.Instance.localAvatar == _playerPhotonView.gameObject) {
-			// scale hmd head to 0 for every client except the Avatars with a remoteAvatar
-			transform.localScale = new Vector3(0, 0, 0);
-			foreach(Transform t in transform){
-				t.gameObject.SetActive (false);
-			}
-		}*/
     }
 
     public override void Update()

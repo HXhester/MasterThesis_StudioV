@@ -115,7 +115,8 @@ public class PlayerManager : Photon.PunBehaviour
                     eyeOrigs[i] = eyeOrig;
 
                     var raycaster = eyes[i].AddComponent<EyeRaycaster>();
-                    raycaster.eyeOrig = eyeOrig;
+                    if(raycaster!=null)
+                        raycaster.eyeOrig = eyeOrig;
                 }
 
                 FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;
@@ -206,7 +207,6 @@ public class PlayerManager : Photon.PunBehaviour
     {
         Debug.Log("Setting scale of " + playerName + " on all clients");
         GameObject.Find(playerName).transform.localScale *= scale;
-        // Keep world scale of camerarig as 1,1,1
-        GameObject.Find("[CameraRig]").transform.localScale /= scale;
+        GameObject.Find(playerName).GetComponentInChildren<SetHeadPos>().origHeadToEyeVector *= scale;
     }
 }
