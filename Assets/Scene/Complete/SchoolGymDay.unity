@@ -1119,7 +1119,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 187186743}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 372, y: 288.5, z: 0}
+  m_LocalPosition: {x: 531, y: 235.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 239374460}
@@ -1389,7 +1389,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 239374459}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -266.5, z: 0}
+  m_LocalPosition: {x: 0, y: -213.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 894210946}
@@ -3322,6 +3322,7 @@ MonoBehaviour:
   ReStartKey: 114
   ChangeRatingQuestionKey: 113
   LookForAvatarsKey: 108
+  Has2Avatars: 0
 --- !u!1 &842990706
 GameObject:
   m_ObjectHideFlags: 0
@@ -4626,8 +4627,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Please rate how comfortable you are with the distance between you and your
-    partner in last 3 min.
+  m_Text: How do you define the distance between you and your partner in past 3 minutes.
 --- !u!222 &1217499907
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5088,7 +5088,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1425527469}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -252, y: -273.5, z: 0}
+  m_LocalPosition: {x: -411, y: -220.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1599817299}
@@ -5477,7 +5477,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1525246467}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -249.5, z: 0}
+  m_LocalPosition: {x: 0, y: -196.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 187186744}

@@ -259,6 +259,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         }else
         {
             Debug.LogWarning("Distance run out of list. Please start next session!");
+            DistanceText.text = "Distance run out of list. Please start next session!";
         }       
     }
 
