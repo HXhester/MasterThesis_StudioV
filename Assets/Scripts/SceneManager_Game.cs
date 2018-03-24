@@ -36,6 +36,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public KeyCode LookForAvatarsKey = KeyCode.L;
 
     private bool _hasSetAvatars;
+    public bool Has2Avatars;
 
     // UI section
     private Text _Timer;
@@ -53,7 +54,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         _rope1 = GameObject.FindGameObjectWithTag("Rope1");
         _rope2 = GameObject.FindGameObjectWithTag("Rope2");
 
-        StartCoroutine(LookingForAvatars());
+        //StartCoroutine(LookingForAvatars());
         
         _randomizeManager = GetComponent<RandomizeWords>();
 
@@ -139,59 +140,50 @@ public class SceneManager_Game : Photon.MonoBehaviour
             {
                 photonView.RPC("RPC_ShowRatingUI",PhotonTargets.All,1);
             }
-            else if (_avatarHeads != null)
+            else
             {
-                if (_avatarHeads.Count != 2)
-                {
-                    Debug.Log("Waiting for more avatars to join");                    
-                }
-                else
-                {
-                    if (!_hasSetAvatars) {
-                        var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-                        if(avatars.Length!=2)
-                            return;
-
-                        if (GameManager.Instance.UsingVR) {
-                            _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
-                            _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
-                        } else {
-                            _avatarHeads[0] = avatars[0].GetComponent<PlayerManager>().OptitrackHead.gameObject;
-                            _avatarHeads[1] = avatars[1].GetComponent<PlayerManager>().OptitrackHead.gameObject;
-                        }
+                if (Has2Avatars && !_hasSetAvatars) {
+                    var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    if (GameManager.Instance.UsingVR) {
+                        _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
+                        _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
+                    } else {
+                        _avatarHeads[0] = avatars[0].GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                        _avatarHeads[1] = avatars[1].GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                    }
                         
-                        _hasSetAvatars = true;
-                    }
+                    _hasSetAvatars = true;
+                }
 
-                    var dist1 = _avatarHeads[0].transform.position.x - _rope1.transform.position.x;
-                    var dist2 = _avatarHeads[1].transform.position.x - _rope1.transform.position.x;
+                var dist1 = _avatarHeads[0].transform.position.x - _rope1.transform.position.x;
+                var dist2 = _avatarHeads[1].transform.position.x - _rope1.transform.position.x;
 
-                    if (dist1 < dist2)
-                    {
-                        var distToRope1Str = dist1.ToString("0.00");
-                        _board2.GetComponent<Text>().text =
-                            "Please adjust your position to the red rope. Your distance to the rope is: " +
-                            distToRope1Str + "m";
+                if (dist1 < dist2)
+                {
+                    var distToRope1Str = dist1.ToString("0.00");
+                    _board2.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope1Str + "m";
 
-                        var distToRope2Str = (_avatarHeads[1].transform.position.x - _rope2.transform.position.x).ToString("0.00");
-                        _board1.GetComponent<Text>().text =
-                            "Please adjust your position to the red rope. Your distance to the rope is: " +
-                            distToRope2Str + "m";
-                    }
-                    else {
-                        var distToRope1Str = dist2.ToString("0.00");
-                        _board2.GetComponent<Text>().text =
-                            "Please adjust your position to the red rope. Your distance to the rope is: " +
-                            distToRope1Str + "m";
+                    var distToRope2Str = (_avatarHeads[1].transform.position.x - _rope2.transform.position.x).ToString("0.00");
+                    _board1.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope2Str + "m";
+                }
+                else {
+                    var distToRope1Str = dist2.ToString("0.00");
+                    _board2.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope1Str + "m";
 
-                        var distToRope2Str = (_avatarHeads[0].transform.position.x - _rope2.transform.position.x).ToString("0.00");
-                        _board1.GetComponent<Text>().text =
-                            "Please adjust your position to the red rope. Your distance to the rope is: " +
-                            distToRope2Str + "m";
-                    }
+                    var distToRope2Str = (_avatarHeads[0].transform.position.x - _rope2.transform.position.x).ToString("0.00");
+                    _board1.GetComponent<Text>().text =
+                        "Please adjust your position to the red rope. Your distance to the rope is: " +
+                        distToRope2Str + "m";
+                }
 
                     
-                }
+                
             }
         }
 

@@ -6,7 +6,7 @@ using HTC.UnityPlugin.StereoRendering;
 
 public class PlayerManager : Photon.PunBehaviour
 {
-
+    private SceneManager_Game _sceneManager;
     private Transform expressionController;
     [HideInInspector]
     public GameObject Camera;
@@ -123,6 +123,16 @@ public class PlayerManager : Photon.PunBehaviour
                 FindObjectOfType<RecordingManager>().AvatarsReady = true;
             }             
         }  
+    }
+
+    void OnEnable() {
+        _sceneManager = FindObjectOfType<SceneManager_Game>();
+        if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
+            _sceneManager.Has2Avatars = true;
+    }
+
+    void OnDisable() {
+        _sceneManager.Has2Avatars = false;
     }
 
     void Update()
