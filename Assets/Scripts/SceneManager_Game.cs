@@ -144,6 +144,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             {
                 if (Has2Avatars && !_hasSetAvatars) {
                     var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    _avatarHeads = new List<GameObject> { null, null };
                     if (GameManager.Instance.UsingVR) {
                         _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
                         _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
@@ -154,6 +155,9 @@ public class SceneManager_Game : Photon.MonoBehaviour
                         
                     _hasSetAvatars = true;
                 }
+
+                if (_avatarHeads[0] == null)
+                    return;
 
                 var dist1 = _avatarHeads[0].transform.position.x - _rope1.transform.position.x;
                 var dist2 = _avatarHeads[1].transform.position.x - _rope1.transform.position.x;
