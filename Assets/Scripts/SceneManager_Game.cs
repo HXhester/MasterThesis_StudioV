@@ -156,7 +156,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
                     _hasSetAvatars = true;
                 }
 
-                if (_avatarHeads[0] == null)
+                if (_avatarHeads.Count!=2)
                     return;
 
                 var dist1 = _avatarHeads[0].transform.position.x - _rope1.transform.position.x;
