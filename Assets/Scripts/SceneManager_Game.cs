@@ -306,8 +306,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
             if (GameManager.Instance.UsingVR)
             {
                 var avatars = GameObject.FindGameObjectsWithTag("HMDHead");
-                if(avatars.Length!=2)
+                if (avatars.Length != 2) {
+                    yield return new WaitForEndOfFrame();
                     continue;
+                }
 
                 foreach (GameObject a in avatars) {
                     _avatarHeads.Add(a);
@@ -318,8 +320,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
             else
             {
                 var avatars = GameObject.FindGameObjectsWithTag("OptitrackHead");
-                if (avatars.Length != 2)
+                if (avatars.Length != 2) {
+                    yield return new WaitForEndOfFrame();
                     continue;
+                }
 
                 foreach (GameObject a in avatars)
                 {
