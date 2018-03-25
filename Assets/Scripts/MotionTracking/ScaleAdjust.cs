@@ -20,7 +20,9 @@ public class ScaleAdjust : MonoBehaviour {
 
     void Awake()
     {
-        originalHeight = eyeLevel.position.y;
+        var headEnd = transform.Find("HeadEnd");
+        originalHeight = GameManager.Instance.UsingVR ? eyeLevel.position.y : headEnd.position.y;
+
 
         HMDHead = transform.Find("mixamorig:Head").transform;
 
@@ -34,7 +36,14 @@ public class ScaleAdjust : MonoBehaviour {
     void Start()
     {
         //CameraRig = GameObject.Find("[CameraRig]").transform;
-        targetHeight = PlayerPrefs.GetFloat("ActorHeight") - headTipToEye;
+        if (GameManager.Instance.UsingVR)
+        {
+            targetHeight = PlayerPrefs.GetFloat("ActorHeight") - headTipToEye;
+        }
+        else
+        {
+            targetHeight = PlayerPrefs.GetFloat("ActorHeight");
+        }
         float scale = targetHeight / originalHeight;
 
         if (_photonView.isMine) {

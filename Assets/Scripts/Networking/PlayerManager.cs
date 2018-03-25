@@ -217,6 +217,7 @@ public class PlayerManager : Photon.PunBehaviour
     {
         Debug.Log("Setting scale of " + playerName + " on all clients");
         GameObject.Find(playerName).transform.localScale *= scale;
-        GameObject.Find(playerName).GetComponentInChildren<SetHeadPos>().origHeadToEyeVector *= scale;
+        if(GameManager.Instance.UsingVR)
+            GameObject.Find(playerName).GetComponentInChildren<SetHeadPos>().origHeadToEyeVector *= scale;
     }
 }
