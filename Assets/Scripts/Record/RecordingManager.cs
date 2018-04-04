@@ -12,11 +12,15 @@ using Debug = UnityEngine.Debug;
 public class RecordingManager : Photon.PunBehaviour {
 
     private string _eyeFilename;
-    private StreamWriter sw_eye;
+    private StreamWriter sw_mutualGaze;
+    public StreamWriter sw_otherLog;
+
     public GameObject[]  Eyes;            // Left eye gameobjects on avatars    
     private WorldTimer _worldTimer;
     private bool _isMutualGazeInLastFrame;
     public bool AvatarsReady;
+    private bool _wasAGazingBLastFrame;
+    private bool _wasBGazingALastFrame;
 
     [HideInInspector]
     public bool IsRecording = false;
@@ -34,26 +38,28 @@ public class RecordingManager : Photon.PunBehaviour {
     void Update () {
         if (PhotonNetwork.isMasterClient && AvatarsReady)
         {
+            // ==========================Recording for mutual gaze=====================================
             if (!_isMutualGazeInLastFrame && IsMutualGaze(Eyes[0], Eyes[1]))
             {
                 if (IsRecording)
                 {
-                    sw_eye.WriteLine("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
-                    Debug.Log("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
-                    //Debug.Log("Mutual gaze starts," + Time.time);
+                    sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Mutual gaze starts");
+                    Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Mutual gaze starts");
                 }
             }
             else if(_isMutualGazeInLastFrame && !IsMutualGaze(Eyes[0], Eyes[1]))
             {
                 if (IsRecording)
                 {
-                    sw_eye.WriteLine("Mutual gaze ends," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
-                    Debug.Log("Mutual gaze ends," + _worldTimer.ElapsedTimeSinceStart.TotalSeconds);
-                    //Debug.Log("Mutual gaze ends," + Time.time);
+                    sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Mutual gaze ends");
+                    Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Mutual gaze ends");
                 }
             }
 
             _isMutualGazeInLastFrame = IsMutualGaze(Eyes[0], Eyes[1]);
+
+            // ==========================Recording for one-way gaze=====================================
+            LogOtherBehaviours(sw_otherLog);
         }
     }
 
@@ -82,13 +88,17 @@ public class RecordingManager : Photon.PunBehaviour {
         _eyeFilename += dyadType + "_" + distance;
         string nameBase = String.Format("{0}_{1:yyyy-MM-dd_HH-mm-ss}", _eyeFilename, DateTime.Now);
         _eyeFilename = path + "EyeData_" + nameBase + ".txt";
-        sw_eye = new StreamWriter(_eyeFilename);
+        string _otherLog = path + "OtherLog_" + nameBase + ".txt";
+        sw_mutualGaze = new StreamWriter(_eyeFilename);
+        sw_otherLog = new StreamWriter(_otherLog);
 
         IsRecording = true;
         _worldTimer.StartTimer();
-        sw_eye.WriteLine("Start recording," + _worldTimer.ElapsedTimeSinceStart);
+        sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
+        sw_otherLog.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
+
         if (IsMutualGaze(Eyes[0], Eyes[1])) {
-            sw_eye.WriteLine("Mutual gaze starts," + _worldTimer.ElapsedTimeSinceStart);
+            sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Mutual gaze starts");
         }
     }
 
@@ -97,10 +107,15 @@ public class RecordingManager : Photon.PunBehaviour {
     {     
         IsRecording = false;
         
-        if (sw_eye != null)
+        if (sw_mutualGaze != null)
         {
-            sw_eye.WriteLine("Stop recording," + _worldTimer.ElapsedTimeSinceStart);
-            sw_eye.Close();
+            sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
+            sw_mutualGaze.Close();
+        }
+        if (sw_otherLog != null)
+        {
+            sw_otherLog.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
+            sw_otherLog.Close();
         }
 
         GetComponent<WorldTimer>().StopTimer();
@@ -109,17 +124,61 @@ public class RecordingManager : Photon.PunBehaviour {
 
     bool IsMutualGaze(GameObject eye1, GameObject eye2)
     {
-        // if angle between vector eye.forward and eye-eye vector < 9°, then is gazing
-        Vector3 gazeDirection1;
-        Vector3 gazeDirection2;
-        Vector3 eye1ToEye2Dir;
-
-        gazeDirection1 = eye1.transform.forward;
-        gazeDirection2 = eye2.transform.forward;
-        eye1ToEye2Dir = eye2.transform.position - eye1.transform.position;
-        float angle1 = Vector3.Angle(gazeDirection1, eye1ToEye2Dir);
-        float angle2 = Vector3.Angle(gazeDirection2, -eye1ToEye2Dir);
+        // if angle between vector eye.forward and eye-eye vector < 9°, then is gazing       
        
-        return (Mathf.Abs(angle1) < 9f) && (Mathf.Abs(angle2) < 9f);
+        return IsAGazingB(eye1,eye2) && IsAGazingB(eye2, eye1);
+    }
+
+    bool IsAGazingB(GameObject a, GameObject b)
+    {
+        Vector3 gazeDirection;
+        Vector3 AToBDir;
+
+        gazeDirection = a.transform.forward;
+        AToBDir = b.transform.position - a.transform.position;
+        float angle = Vector3.Angle(gazeDirection, AToBDir);
+
+        return Mathf.Abs(angle) < 9f;
+    }
+
+    void LogOtherBehaviours(StreamWriter sw)
+    {
+        if (!_wasAGazingBLastFrame && IsAGazingB(Eyes[0], Eyes[1]))
+        {
+            if (IsRecording)
+            {
+                sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + Eyes[0].name + ",starts gazing at " + Eyes[1].name);
+                Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + Eyes[0].name + ",One-way gaze starts");
+            }
+        }
+        else if (_wasAGazingBLastFrame && !IsAGazingB(Eyes[0], Eyes[1]))
+        {
+            if (IsRecording)
+            {
+                sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + Eyes[0].name + ",One-way gaze ends");
+                Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + Eyes[0].name + ",One-way gaze ends");
+            }
+        }
+        _wasAGazingBLastFrame = IsAGazingB(Eyes[0], Eyes[1]);
+
+        // Another way around
+        if (!_wasBGazingALastFrame && IsAGazingB(Eyes[1], Eyes[0]))
+        {
+            if (IsRecording)
+            {
+                sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + Eyes[1].name + ",starts gazing at " + Eyes[0].name);
+                Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + Eyes[1].name + ",One-way gaze starts");
+            }
+        }
+        else if (_wasBGazingALastFrame && !IsAGazingB(Eyes[1], Eyes[0]))
+        {
+            if (IsRecording)
+            {
+                sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + Eyes[1].name + ",One-way gaze ends");
+                Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + Eyes[1].name + ",One-way gaze ends");
+            }
+        }
+        _wasBGazingALastFrame = IsAGazingB(Eyes[1], Eyes[0]);
+
     }
 }

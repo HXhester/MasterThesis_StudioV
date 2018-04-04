@@ -84,7 +84,9 @@ public class PlayerManager : Photon.PunBehaviour
                 localOptitrackAnimator.gameObject.SetActive(true);
                 remoteOptitrackAnimator.gameObject.SetActive(false);
 
-                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");              
+                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
+                //TODO: only for testing, need to remove
+                eyes = new GameObject[2] { eyes[1], eyes[2] };         
             }
             else
             {
@@ -105,6 +107,8 @@ public class PlayerManager : Photon.PunBehaviour
 
                     var eyeOrig = new GameObject("EyeOrig");
                     eyeOrig.transform.SetParent(eyes[i].transform.parent);
+                    StartCoroutine(ChangeEyeOrigName(eyeOrig));
+
                     if (GameManager.Instance.UsingVR) {
                         eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
                     } else {
@@ -219,5 +223,18 @@ public class PlayerManager : Photon.PunBehaviour
         GameObject.Find(playerName).transform.localScale *= scale;
         if(GameManager.Instance.UsingVR)
             GameObject.Find(playerName).GetComponentInChildren<SetHeadPos>().origHeadToEyeVector *= scale;
+    }
+
+    IEnumerator ChangeEyeOrigName(GameObject eyeOrig)
+    {
+        Debug.Log("change eye orig name coroutin starts");
+        Transform parent = eyeOrig.transform.parent;
+        while (parent.tag != "Avatar")
+        {
+            parent = parent.parent;
+            yield return new WaitForEndOfFrame();
+        }
+
+        eyeOrig.name = "EyeOrig" + parent.name;
     }
 }

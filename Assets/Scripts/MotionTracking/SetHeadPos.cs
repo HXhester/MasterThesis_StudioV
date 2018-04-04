@@ -20,7 +20,7 @@ public class SetHeadPos : NetworkedPositionSmoothening {
 
     void Start()
     {
-        if (_playerPhotonView.isMine)
+        if (_playerPhotonView.isMine && !PhotonNetwork.isMasterClient)
         {
             CameraEye = transform.parent.GetComponent<PlayerManager>().Camera.transform;
             origHeadToEyeVector = -transform.position;
@@ -40,7 +40,7 @@ public class SetHeadPos : NetworkedPositionSmoothening {
 
     public override void Update()
     {
-        if (_playerPhotonView.isMine)
+        if (_playerPhotonView.isMine && !PhotonNetwork.isMasterClient)
         {
             //			Vector3 newPos;
             Vector3 rot = CameraEye.localEulerAngles;

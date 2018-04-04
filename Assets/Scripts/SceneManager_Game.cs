@@ -15,6 +15,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private GameObject _rope1;
     private GameObject _rope2;
     private List<GameObject> _avatarHeads;
+    private GameObject[] _avatars;
     private GameObject[] _inGameRatingUI;
     private GameObject _screenUI;
 
@@ -40,10 +41,13 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
     // UI section
     private Text _Timer;
+    private WorldTimer _worldTimer;
 
     void Start () {
+        _worldTimer = GameManager.Instance.gameObject.GetComponent<WorldTimer>();
         _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
         _avatarHeads = new List<GameObject>();
+        _avatars = new GameObject[2];
 
         _Timer = GameObject.Find("CountDownTimer").GetComponent<Text>();
         _Timer.gameObject.SetActive(false);
@@ -92,7 +96,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             AssignDistancesOnRopes();
 	    }
 
-        currentCountDown = CountDownTime;
+        //currentCountDown = CountDownTime;
 
     }
 
@@ -104,12 +108,12 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
         if (HasStarted)
         {
-            currentCountDown = currentCountDown - Time.deltaTime;
+            currentCountDown = (float)_worldTimer.ElapsedTimeSinceStart.TotalSeconds;
             _Timer.gameObject.SetActive(true);
-            _Timer.text = currentCountDown.ToString("0.00");
+            _Timer.text = currentCountDown.ToString("0.000");
 
             if (PhotonNetwork.isMasterClient) {
-                if (currentCountDown <= 0)
+                if (currentCountDown >= CountDownTime)
                 {
                     StopGame();
                     AssignDistancesOnRopes();
@@ -143,14 +147,14 @@ public class SceneManager_Game : Photon.MonoBehaviour
             else
             {
                 if (Has2Avatars && !_hasSetAvatars) {
-                    var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    _avatars = GameObject.FindGameObjectsWithTag("Avatar");
                     _avatarHeads = new List<GameObject> { null, null };
                     if (GameManager.Instance.UsingVR) {
-                        _avatarHeads[0] = avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
-                        _avatarHeads[1] = avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
+                        _avatarHeads[0] = _avatars[0].GetComponentInChildren<SetHeadPos>().gameObject;
+                        _avatarHeads[1] = _avatars[1].GetComponentInChildren<SetHeadPos>().gameObject;                  
                     } else {
-                        _avatarHeads[0] = avatars[0].GetComponent<PlayerManager>().OptitrackHead.gameObject;
-                        _avatarHeads[1] = avatars[1].GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                        _avatarHeads[0] = _avatars[0].GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                        _avatarHeads[1] = _avatars[1].GetComponent<PlayerManager>().OptitrackHead.gameObject;
                     }
                         
                     _hasSetAvatars = true;
@@ -225,7 +229,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     void RPC_StartGame()
     {
         FindObjectOfType<SceneManager_Game>().HasStarted = true;
-        FindObjectOfType<SceneManager_Game>().currentCountDown = FindObjectOfType<SceneManager_Game>().CountDownTime;
+        //FindObjectOfType<SceneManager_Game>().currentCountDown = FindObjectOfType<SceneManager_Game>().CountDownTime;
         GameObject.Find("StartButton").GetComponent<Button>().interactable = false;
 
         _inGameRatingUI[0].SetActive(false);
@@ -277,6 +281,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
             _board1.GetComponent<Text>().text = "It's your turn to guess.";
             _board2.GetComponent<Text>().text = category + ":" + word;
         }
+
+        Log20QuesionGame();
     }
 
     [PunRPC]
@@ -330,5 +336,38 @@ public class SceneManager_Game : Photon.MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
         }
-    }    
+    }
+
+    void Log20QuesionGame()
+    {
+        if (PhotonNetwork.isMasterClient)
+        {
+            var recordingManager = _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
+            var worldTimer = GameManager.Instance.gameObject.GetComponent<WorldTimer>();
+            GameObject board = null;
+
+            if (_board1.GetComponent<Text>().text == "It's your turn to guess.")
+            {
+                board = _board1;
+            }
+            if (_board2.GetComponent<Text>().text == "It's your turn to guess.")
+            {
+                board = _board2;
+            }
+
+            if(board==null)
+                return;
+
+            var dist1 = (board.transform.position - _avatarHeads[0].transform.position).magnitude;
+            var dist2 = (board.transform.position - _avatarHeads[1].transform.position).magnitude;
+            if (dist1 > dist2)
+            {
+                recordingManager.sw_otherLog.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[0].name + ",is guessing");
+            }
+            else
+            {
+                recordingManager.sw_otherLog.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[1].name + ",is guessing");
+            }
+        }
+    }
 }
