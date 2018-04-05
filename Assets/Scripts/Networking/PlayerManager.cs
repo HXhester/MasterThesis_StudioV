@@ -86,7 +86,7 @@ public class PlayerManager : Photon.PunBehaviour
 
                 eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
                 //TODO: only for testing, need to remove
-                eyes = new GameObject[2] { eyes[1], eyes[2] };         
+                //eyes = new GameObject[2] { eyes[1], eyes[2] };         
             }
             else
             {
@@ -115,7 +115,6 @@ public class PlayerManager : Photon.PunBehaviour
                         eyeOrig.transform.localPosition = eyes[i].transform.localPosition;
                     }
                         
-
                     eyeOrigs[i] = eyeOrig;
 
                     var raycaster = eyes[i].AddComponent<EyeRaycaster>();
@@ -123,8 +122,13 @@ public class PlayerManager : Photon.PunBehaviour
                         raycaster.eyeOrig = eyeOrig;
                 }
 
-                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;
+                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;                
                 FindObjectOfType<RecordingManager>().AvatarsReady = true;
+                var heads = GameObject.FindGameObjectsWithTag("HMDHead");
+                foreach (GameObject head in heads) {
+                    head.name = head.transform.parent.name;
+                }
+                FindObjectOfType<RecordingManager>().Heads = heads;
             }             
         }  
     }
@@ -235,6 +239,6 @@ public class PlayerManager : Photon.PunBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        eyeOrig.name = "EyeOrig" + parent.name;
+        eyeOrig.name = parent.name;
     }
 }
