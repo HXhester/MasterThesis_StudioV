@@ -362,11 +362,11 @@ public class SceneManager_Game : Photon.MonoBehaviour
             var dist2 = (board.transform.position - _avatarHeads[1].transform.position).magnitude;
             if (dist1 > dist2)
             {
-                recordingManager.sw_otherLog.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[0].name + ",is guessing");
+                recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[0].name + ",is guessing");
             }
             else
             {
-                recordingManager.sw_otherLog.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[1].name + ",is guessing");
+                recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[1].name + ",is guessing");
             }
         }
     }
