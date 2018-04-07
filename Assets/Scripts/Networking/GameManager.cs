@@ -158,6 +158,8 @@ public class GameManager : Photon.PunBehaviour
         Debug.Log("vr mode is: " + isUsingVR);
         // TODO: test if this disable vr
         XRSettings.enabled = isUsingVR;
-        VRModeChangeDelegate();
+
+        if (VRModeChangeDelegate != null)
+            VRModeChangeDelegate();
     }
 }

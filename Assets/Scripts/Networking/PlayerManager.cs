@@ -41,6 +41,60 @@ public class PlayerManager : Photon.PunBehaviour
             }
         }
 
+        // Master client should have HMD avatar enable to collect correct data
+        if (PhotonNetwork.isMasterClient) {
+            if (GameManager.Instance.UsingVR) {
+                localOptitrackAnimator.gameObject.SetActive(true);
+                remoteOptitrackAnimator.gameObject.SetActive(false);
+                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
+                //TODO: only for testing, need to remove
+                //eyes = new GameObject[2] { eyes[1], eyes[2] };         
+            }
+            else {
+                localOptitrackAnimator.gameObject.SetActive(false);
+                remoteOptitrackAnimator.gameObject.SetActive(true);
+
+                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
+                GetComponent<FacialController>().enabled = false;
+                GetComponent<EyeController>().enabled = false;
+
+                eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
+            }
+
+            if (eyes.Length == 2) {
+                Debug.Log("find eyes");
+
+                eyeOrigs = new GameObject[2];
+                for (int i = 0; i < eyes.Length; i++) {
+
+                    var eyeOrig = new GameObject("EyeOrig");
+                    eyeOrig.transform.SetParent(eyes[i].transform.parent);
+                    StartCoroutine(ChangeEyeOrigName(eyeOrig));
+
+                    if (GameManager.Instance.UsingVR) {
+                        eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
+                    }
+                    else {
+                        eyeOrig.transform.localPosition = eyes[i].transform.localPosition;
+                    }
+
+                    eyeOrigs[i] = eyeOrig;
+
+                    var raycaster = eyes[i].AddComponent<EyeRaycaster>();
+                    if (raycaster != null)
+                        raycaster.eyeOrig = eyeOrig;
+                }
+
+                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;
+                FindObjectOfType<RecordingManager>().AvatarsReady = true;
+                var heads = GameObject.FindGameObjectsWithTag("HMDHead");
+                foreach (GameObject head in heads) {
+                    head.name = head.transform.parent.name;
+                }
+                FindObjectOfType<RecordingManager>().Heads = heads;
+            }
+        }
+
     }
 
     void OnDisable() {
@@ -114,64 +168,7 @@ public class PlayerManager : Photon.PunBehaviour
             }
             //localOptitrackAnimator.gameObject.SetActive(false);
             //remoteOptitrackAnimator.gameObject.SetActive(true);
-        }
-
-        // Master client should have HMD avatar enable to collect correct data
-        if (PhotonNetwork.isMasterClient)
-        {
-            if (GameManager.Instance.UsingVR)
-            {
-                localOptitrackAnimator.gameObject.SetActive(true);
-                remoteOptitrackAnimator.gameObject.SetActive(false);
-
-                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
-                //TODO: only for testing, need to remove
-                //eyes = new GameObject[2] { eyes[1], eyes[2] };         
-            }
-            else
-            {
-                localOptitrackAnimator.gameObject.SetActive(false);
-                remoteOptitrackAnimator.gameObject.SetActive(true);
-
-                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
-                GetComponent <FacialController>().enabled = false;
-                GetComponent<EyeController>().enabled = false;
-
-                eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");               
-            }
-
-            if (eyes.Length == 2) {
-                Debug.Log("find eyes");
-
-                eyeOrigs = new GameObject[2];
-                for(int i=0; i<eyes.Length;i++) {
-
-                    var eyeOrig = new GameObject("EyeOrig");
-                    eyeOrig.transform.SetParent(eyes[i].transform.parent);
-                    StartCoroutine(ChangeEyeOrigName(eyeOrig));
-
-                    if (GameManager.Instance.UsingVR) {
-                        eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
-                    } else {
-                        eyeOrig.transform.localPosition = eyes[i].transform.localPosition;
-                    }
-                        
-                    eyeOrigs[i] = eyeOrig;
-
-                    var raycaster = eyes[i].AddComponent<EyeRaycaster>();
-                    if(raycaster!=null)
-                        raycaster.eyeOrig = eyeOrig;
-                }
-
-                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;                
-                FindObjectOfType<RecordingManager>().AvatarsReady = true;
-                var heads = GameObject.FindGameObjectsWithTag("HMDHead");
-                foreach (GameObject head in heads) {
-                    head.name = head.transform.parent.name;
-                }
-                FindObjectOfType<RecordingManager>().Heads = heads;
-            }             
-        }  
+        } 
     }
 
     void ToggleAvatarUI() {
