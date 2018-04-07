@@ -22,6 +22,7 @@ public class PlayerManager : Photon.PunBehaviour
     private GameObject[] eyeOrigs;
 
     void OnEnable() {
+        gameObject.name += photonView.viewID.ToString();
         _sceneManager = FindObjectOfType<SceneManager_Game>();
         if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
             _sceneManager.Has2Avatars = true;
@@ -49,7 +50,7 @@ public class PlayerManager : Photon.PunBehaviour
 
 
     void DealWithVRmodeChange() {
-        gameObject.name += photonView.viewID.ToString();
+        
         ToggleAvatarUI();
 
         //If the spawned avatar is mine, only deal with avatar client
