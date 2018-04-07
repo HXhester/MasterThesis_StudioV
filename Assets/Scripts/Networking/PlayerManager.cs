@@ -185,6 +185,9 @@ public class PlayerManager : Photon.PunBehaviour
         if (!PhotonNetwork.isMasterClient)
             return;
 
+        if (eyes.Length!=2)
+            return;
+        
         for (int i = 0; i < eyes.Length; i++)
         {
             eyeOrigs[i].transform.rotation = eyes[i].transform.rotation;
