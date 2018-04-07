@@ -40,10 +40,10 @@ public class RandomizeWords : MonoBehaviour
         }
         else
         {
-            GetComponent<SceneManager_Game>().CountDownTime = 15f;
+            GetComponent<SceneManager_Game>().CountDownTime = 30f;
             CategoryWordDict.Add("Cat","Animals");
             CategoryWordDict.Add("Tiger","Animals");
-            CategoryWordDict.Add("Stawberry","Fruits");
+            CategoryWordDict.Add("Strawberry","Fruits");
         }
 
         WordList = new string[CategoryWordDict.Count];
