@@ -15,13 +15,6 @@ public class GameManager : Photon.PunBehaviour
     public string DyadType;
     public bool UsingVR;
 
-    void Enable() {
-        VRModeChangeDelegate += ToggleAvatarUI;
-    }
-    void Disable() {
-        VRModeChangeDelegate -= ToggleAvatarUI;
-    }
-
     private void Awake()
     {
         //Check if instance already exists
@@ -166,14 +159,5 @@ public class GameManager : Photon.PunBehaviour
         // TODO: test if this disable vr
         XRSettings.enabled = isUsingVR;
         VRModeChangeDelegate();
-    }
-
-    void ToggleAvatarUI() {
-        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
-        bool usingvr = GameManager.Instance.UsingVR;
-        Debug.Log("is using vr: " + usingvr);
-        foreach (GameObject go in avatarUi) {
-            go.GetComponent<Canvas>().enabled = usingvr;
-        }
     }
 }

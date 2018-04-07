@@ -43,6 +43,22 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private Text _Timer;
     private WorldTimer _worldTimer;
 
+    void Enable() {
+        GameManager.VRModeChangeDelegate += ToggleAvatarUI;
+    }
+    void Disable() {
+        GameManager.VRModeChangeDelegate -= ToggleAvatarUI;
+    }
+
+    void ToggleAvatarUI() {
+        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
+        bool usingvr = GameManager.Instance.UsingVR;
+        Debug.Log("is using vr: " + usingvr);
+        foreach (GameObject go in avatarUi) {
+            go.GetComponent<Canvas>().enabled = usingvr;
+        }
+    }
+
     void Start () {
         _worldTimer = GameManager.Instance.gameObject.GetComponent<WorldTimer>();
         _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
