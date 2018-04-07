@@ -155,7 +155,8 @@ public class GameManager : Photon.PunBehaviour
 
     [PunRPC]
     void RPC_SetVRMode(bool isUsingVR) {
-        Instance.UsingVR = isUsingVR;
+        GameManager.Instance.UsingVR = isUsingVR;
+        Debug.Log("vr mode is: " + isUsingVR);
         // TODO: test if this disable vr
         XRSettings.enabled = isUsingVR;
     }
