@@ -109,8 +109,9 @@ public class GameManager : Photon.PunBehaviour
 						listener.enabled = true;
 					}
 					GameObject[] avatarUi = GameObject.FindGameObjectsWithTag ("AvatarUI");
-					foreach (GameObject go in avatarUi) {
-						go.GetComponent<Canvas> ().enabled = true;
+                    bool usingvr = UsingVR;
+                    foreach (GameObject go in avatarUi) {
+						go.GetComponent<Canvas> ().enabled = UsingVR;
 					}
 					player.GetComponent<PlayerManager> ().SetSkeletonName ();
 					player.GetComponent<PlayerManager> ().localOptitrackAnimator.enabled = true;
@@ -138,8 +139,9 @@ public class GameManager : Photon.PunBehaviour
 					listener.enabled = true;
 				}
 				GameObject[] avatarUi = GameObject.FindGameObjectsWithTag ("AvatarUI");
+                bool usingvr = UsingVR;
 				foreach (GameObject go in avatarUi) {
-					go.GetComponent<Canvas> ().enabled = true;
+					go.GetComponent<Canvas> ().enabled = UsingVR;
 				}
 				player.GetComponent<PlayerManager> ().SetSkeletonName (skeletonName);
 			}

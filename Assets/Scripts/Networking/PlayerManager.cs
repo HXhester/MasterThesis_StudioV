@@ -26,7 +26,7 @@ public class PlayerManager : Photon.PunBehaviour
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
 
         //If the spawned avatar is mine, only deal with avatar client
-        if (photonView.isMine)
+        if (photonView.isMine && !PhotonNetwork.isMasterClient)
         {
             var cameraRig = GameObject.Find("[CameraRig]").transform;
             try
@@ -53,6 +53,7 @@ public class PlayerManager : Photon.PunBehaviour
             // if not using vr, then see the remote one
             else
             {
+                Debug.Log("is not using vr");
                 localOptitrackAnimator.gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
 
@@ -69,7 +70,7 @@ public class PlayerManager : Photon.PunBehaviour
             remoteOptitrackAnimator.enabled = false;
 
             //Not necessary if remoteavatar is already set to layer Remote in the prefab..
-            SetLayerTo(this, "Remote");
+            //SetLayerTo(this, "Remote");
 
             var overviewcam = GameObject.FindGameObjectWithTag("CameraClientPickup");
             if (overviewcam != null)
@@ -81,18 +82,20 @@ public class PlayerManager : Photon.PunBehaviour
             
             //Find the other avatar clients and tell them to set the newly spawned RemoteAvatar to Remote Layer - this is done because every avatar should see the local avatars in order to have synced positions
             GameObject[] avatars = GameObject.FindGameObjectsWithTag("Avatar");
+
+            bool usingVR = GameManager.Instance.UsingVR;
             foreach (GameObject g in avatars)
             {
                 if (g.GetPhotonView().isMine)
                 {
-					g.GetComponent<PlayerManager>().localOptitrackAnimator.gameObject.SetActive(true);
-					g.GetComponent<PlayerManager>().remoteOptitrackAnimator.gameObject.SetActive(false);
+					g.GetComponent<PlayerManager>().localOptitrackAnimator.gameObject.SetActive(usingVR);
+					g.GetComponent<PlayerManager>().remoteOptitrackAnimator.gameObject.SetActive(!usingVR);
 					//if the other avatar is mine then return. if no avatar is mine continue to show only remote/optitrack gameObject.
 					return;
                 }
             }
-            localOptitrackAnimator.gameObject.SetActive(false);
-            remoteOptitrackAnimator.gameObject.SetActive(true);
+            //localOptitrackAnimator.gameObject.SetActive(false);
+            //remoteOptitrackAnimator.gameObject.SetActive(true);
         }
 
         // Master client should have HMD avatar enable to collect correct data
