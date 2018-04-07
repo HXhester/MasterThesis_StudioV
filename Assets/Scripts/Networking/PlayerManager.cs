@@ -20,28 +20,32 @@ public class PlayerManager : Photon.PunBehaviour
 
     private GameObject[] eyes;
     private GameObject[] eyeOrigs;
-    void Awake()
-    {
-        gameObject.name += photonView.viewID.ToString();
+
+    private void Awake() {
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
 
-        //If the spawned avatar is mine, only deal with avatar client
-        if (photonView.isMine && !PhotonNetwork.isMasterClient)
-        {
+        if (photonView.isMine && !PhotonNetwork.isMasterClient) {
             var cameraRig = GameObject.Find("[CameraRig]").transform;
-            try
-            {
+            try {
                 Camera = cameraRig.Find("Camera (head)").Find("Camera (eye)").gameObject;
                 //listener = cameraRig.Find("Camera (head)").Find("Camera (ears)").GetComponent<AudioListener>();
-            }
-            catch (System.Exception)
-            {
+            } catch (System.Exception) {
                 Camera = cameraRig.Find("Camera (eye)").gameObject;
                 //listener = cameraRig.Find("Camera (eye)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
+        }
+    }
+
+    public override void OnJoinedRoom() {
+        gameObject.name += photonView.viewID.ToString();
+        
+        //If the spawned avatar is mine, only deal with avatar client
+        if (photonView.isMine && !PhotonNetwork.isMasterClient)
+        {
             // if using vr, then only see local avatar
             if (GameManager.Instance.UsingVR)
             {
+                Debug.Log("is using vr");
                 localOptitrackAnimator.gameObject.SetActive(true);
                 remoteOptitrackAnimator.gameObject.SetActive(false);
 
@@ -53,7 +57,6 @@ public class PlayerManager : Photon.PunBehaviour
             // if not using vr, then see the remote one
             else
             {
-                Debug.Log("is not using vr");
                 localOptitrackAnimator.gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
 

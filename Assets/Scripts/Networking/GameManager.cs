@@ -88,7 +88,13 @@ public class GameManager : Photon.PunBehaviour
             }
         }
 
-	}
+        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
+        bool usingvr = GameManager.Instance.UsingVR;
+        Debug.Log("is using vr: " + usingvr);
+        foreach (GameObject go in avatarUi) {
+            go.GetComponent<Canvas>().enabled = usingvr;
+        }
+    }
 	public void SpawnResource(string resourceName){
 		Debug.Log ("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
 		//Maybe remove this if statment since OnJoinedRoom doesnt ever seem to be running on masterclient
@@ -108,11 +114,7 @@ public class GameManager : Photon.PunBehaviour
 					if (listener != null) {
 						listener.enabled = true;
 					}
-					GameObject[] avatarUi = GameObject.FindGameObjectsWithTag ("AvatarUI");
-                    bool usingvr = UsingVR;
-                    foreach (GameObject go in avatarUi) {
-						go.GetComponent<Canvas> ().enabled = UsingVR;
-					}
+					
 					player.GetComponent<PlayerManager> ().SetSkeletonName ();
 					player.GetComponent<PlayerManager> ().localOptitrackAnimator.enabled = true;
 					player.GetComponent<PlayerManager> ().remoteOptitrackAnimator.enabled = true;
@@ -120,6 +122,8 @@ public class GameManager : Photon.PunBehaviour
 			}
 		} 
 	}
+
+    // This is only used for replacing avatar
 	public void SpawnResource(string resourceName, string skeletonName){
 		Debug.Log ("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
 		//Maybe remove this if statment since OnJoinedRoom doesnt ever seem to be running on masterclient
