@@ -21,8 +21,13 @@ public class PlayerManager : Photon.PunBehaviour
     private GameObject[] eyes;
     private GameObject[] eyeOrigs;
 
-    private void Awake() {
+    void OnEnable() {
+        _sceneManager = FindObjectOfType<SceneManager_Game>();
+        if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
+            _sceneManager.Has2Avatars = true;
+
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
+        GameManager.VRModeChangeDelegate += DealWithVRmodeChange;
 
         if (photonView.isMine && !PhotonNetwork.isMasterClient) {
             var cameraRig = GameObject.Find("[CameraRig]").transform;
@@ -34,9 +39,16 @@ public class PlayerManager : Photon.PunBehaviour
                 //listener = cameraRig.Find("Camera (eye)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
         }
+
     }
 
-    public override void OnJoinedRoom() {
+    void OnDisable() {
+        _sceneManager.Has2Avatars = false;
+        GameManager.VRModeChangeDelegate -= DealWithVRmodeChange;
+    }
+
+
+    void DealWithVRmodeChange() {
         gameObject.name += photonView.viewID.ToString();
         
         //If the spawned avatar is mine, only deal with avatar client
@@ -160,15 +172,7 @@ public class PlayerManager : Photon.PunBehaviour
         }  
     }
 
-    void OnEnable() {
-        _sceneManager = FindObjectOfType<SceneManager_Game>();
-        if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
-            _sceneManager.Has2Avatars = true;
-    }
 
-    void OnDisable() {
-        _sceneManager.Has2Avatars = false;
-    }
 
     void Update()
     {

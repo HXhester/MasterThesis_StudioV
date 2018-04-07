@@ -7,11 +7,20 @@ using UnityEngine.XR;
 public class GameManager : Photon.PunBehaviour
 {
     public static GameManager Instance;
+    public delegate void OnVRModeChangeDelegate();
+    public static OnVRModeChangeDelegate VRModeChangeDelegate;
 
     [HideInInspector]
     public GameObject localAvatar;
     public string DyadType;
     public bool UsingVR;
+
+    void Enable() {
+        VRModeChangeDelegate += ToggleAvatarUI;
+    }
+    void Disable() {
+        VRModeChangeDelegate -= ToggleAvatarUI;
+    }
 
     private void Awake()
     {
@@ -86,14 +95,7 @@ public class GameManager : Photon.PunBehaviour
             {
                 localAvatar = avatar;
             }
-        }
-
-        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
-        bool usingvr = GameManager.Instance.UsingVR;
-        Debug.Log("is using vr: " + usingvr);
-        foreach (GameObject go in avatarUi) {
-            go.GetComponent<Canvas>().enabled = usingvr;
-        }
+        }        
     }
 	public void SpawnResource(string resourceName){
 		Debug.Log ("Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
@@ -163,5 +165,15 @@ public class GameManager : Photon.PunBehaviour
         Debug.Log("vr mode is: " + isUsingVR);
         // TODO: test if this disable vr
         XRSettings.enabled = isUsingVR;
+        VRModeChangeDelegate();
+    }
+
+    void ToggleAvatarUI() {
+        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
+        bool usingvr = GameManager.Instance.UsingVR;
+        Debug.Log("is using vr: " + usingvr);
+        foreach (GameObject go in avatarUi) {
+            go.GetComponent<Canvas>().enabled = usingvr;
+        }
     }
 }
