@@ -291,7 +291,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
         Debug.Log("Distance between players is: " + dist);
       
         _rope1.transform.position = new Vector3(-dist/2f, 1f, 0);
-        _rope2.transform.position = new Vector3(dist/2f, 1f, 0);      
+        _rope2.transform.position = new Vector3(dist/2f, 1f, 0);
+
+        var distUI = FindObjectOfType<SceneManager_Game>().DistanceText;
+        distUI.text = "Current distance is: " + dist;
     }
 
     [PunRPC]
