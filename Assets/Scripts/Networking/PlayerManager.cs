@@ -50,7 +50,8 @@ public class PlayerManager : Photon.PunBehaviour
 
     void DealWithVRmodeChange() {
         gameObject.name += photonView.viewID.ToString();
-        
+        ToggleAvatarUI();
+
         //If the spawned avatar is mine, only deal with avatar client
         if (photonView.isMine && !PhotonNetwork.isMasterClient)
         {
@@ -172,11 +173,18 @@ public class PlayerManager : Photon.PunBehaviour
         }  
     }
 
-
+    void ToggleAvatarUI() {
+        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
+        bool usingvr = GameManager.Instance.UsingVR;
+        Debug.Log("is using vr: " + usingvr);
+        foreach (GameObject go in avatarUi) {
+            go.GetComponent<Canvas>().enabled = usingvr;
+        }
+    }
 
     void Update()
     {
-        if (!PhotonNetwork.isMasterClient || eyes.Length != 2)
+        if (!PhotonNetwork.isMasterClient)
             return;
 
         for (int i = 0; i < eyes.Length; i++)

@@ -43,22 +43,6 @@ public class SceneManager_Game : Photon.MonoBehaviour
     private Text _Timer;
     private WorldTimer _worldTimer;
 
-    void Enable() {
-        GameManager.VRModeChangeDelegate += ToggleAvatarUI;
-    }
-    void Disable() {
-        GameManager.VRModeChangeDelegate -= ToggleAvatarUI;
-    }
-
-    void ToggleAvatarUI() {
-        GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
-        bool usingvr = GameManager.Instance.UsingVR;
-        Debug.Log("is using vr: " + usingvr);
-        foreach (GameObject go in avatarUi) {
-            go.GetComponent<Canvas>().enabled = usingvr;
-        }
-    }
-
     void Start () {
         _worldTimer = GameManager.Instance.gameObject.GetComponent<WorldTimer>();
         _recordingManager = GameManager.Instance.gameObject.GetComponent<RecordingManager>();
@@ -250,6 +234,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
         _inGameRatingUI[0].SetActive(false);
         _inGameRatingUI[1].SetActive(false);
+
+        _worldTimer.StartTimer();
     }
 
     [PunRPC]
@@ -257,6 +243,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
     {
         FindObjectOfType<SceneManager_Game>().HasStarted = false;
         GameObject.Find("StartButton").GetComponent<Button>().interactable = true;
+        _worldTimer.StopTimer();
+        _worldTimer.ResetTimer();
     }
 
     // Call on space key press during "20 Questions"

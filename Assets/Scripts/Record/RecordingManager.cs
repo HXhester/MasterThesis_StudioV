@@ -119,7 +119,7 @@ public class RecordingManager : Photon.PunBehaviour {
         sw_otherLogForHeads = new StreamWriter(_otherLogHeads);
 
         IsRecording = true;
-        _worldTimer.StartTimer();
+        //_worldTimer.StartTimer();
         sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
         sw_otherLogForEyes.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
         sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
@@ -160,8 +160,8 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_otherLogForHeads.Close();
         }
 
-        GetComponent<WorldTimer>().StopTimer();
-        GetComponent<WorldTimer>().ResetTimer();
+        //GetComponent<WorldTimer>().StopTimer();
+        //GetComponent<WorldTimer>().ResetTimer();
     }
 
     bool IsMutualGaze(GameObject eye1, GameObject eye2)
