@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR;
 
 public class GameManager : Photon.PunBehaviour
 {
@@ -153,5 +154,7 @@ public class GameManager : Photon.PunBehaviour
     [PunRPC]
     void RPC_SetVRMode(bool isUsingVR) {
         Instance.UsingVR = isUsingVR;
+        // TODO: test if this disable vr
+        XRSettings.enabled = isUsingVR;
     }
 }

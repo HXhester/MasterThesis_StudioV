@@ -25,11 +25,9 @@ public class PlayerManager : Photon.PunBehaviour
         gameObject.name += photonView.viewID.ToString();
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
 
-        //If the spawned avatar is mine
+        //If the spawned avatar is mine, only deal with avatar client
         if (photonView.isMine)
         {
-			localOptitrackAnimator.gameObject.SetActive(true);
-			remoteOptitrackAnimator.gameObject.SetActive(false);
             var cameraRig = GameObject.Find("[CameraRig]").transform;
             try
             {
@@ -41,10 +39,31 @@ public class PlayerManager : Photon.PunBehaviour
                 Camera = cameraRig.Find("Camera (eye)").gameObject;
                 //listener = cameraRig.Find("Camera (eye)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
+            // if using vr, then only see local avatar
+            if (GameManager.Instance.UsingVR)
+            {
+                localOptitrackAnimator.gameObject.SetActive(true);
+                remoteOptitrackAnimator.gameObject.SetActive(false);
 
-            Camera.GetComponent<SteamVR_Camera>().enabled = true;
-            Camera.GetComponent<Camera>().enabled = true;
-            Camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
+                Camera.GetComponent<SteamVR_Camera>().enabled = true;
+                Camera.GetComponent<Camera>().enabled = true;
+                // Don't render the remote layer
+                Camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
+            }
+            // if not using vr, then see the remote one
+            else
+            {
+                localOptitrackAnimator.gameObject.SetActive(false);
+                remoteOptitrackAnimator.gameObject.SetActive(true);
+
+                Camera.GetComponent<SteamVR_Camera>().enabled = false;
+                Camera.GetComponent<Camera>().enabled = false;
+
+                // Don't render hmd layer
+                var headCam = OptitrackHead.gameObject.AddComponent<Camera>();
+                headCam.cullingMask &= ~(1 << LayerMask.NameToLayer("HMD"));
+            }
+            
 
             localOptitrackAnimator.enabled = false;
             remoteOptitrackAnimator.enabled = false;
@@ -91,8 +110,9 @@ public class PlayerManager : Photon.PunBehaviour
             else
             {
                 localOptitrackAnimator.gameObject.SetActive(false);
-                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
+
+                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
                 GetComponent <FacialController>().enabled = false;
                 GetComponent<EyeController>().enabled = false;
 
