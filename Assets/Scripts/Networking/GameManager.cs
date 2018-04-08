@@ -165,27 +165,27 @@ public class GameManager : Photon.PunBehaviour
     void startTalking() {
         if (!PhotonNetwork.inRoom)
             return;
-
-        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, true);
+        var name = localAvatar.name;
+        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, name, true);
     }
     void endTalking() {
         if (!PhotonNetwork.inRoom)
             return;
-
-        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, false);
+        var name = localAvatar.name;
+        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, name, false);
     }
 
     [PunRPC]
-    void RPC_WriteTalkingStatus(bool istalking) {
+    void RPC_WriteTalkingStatus(string playerName, bool istalking) {
         var recordingManager = FindObjectOfType<RecordingManager>();
 
         if (!recordingManager.IsRecording)
             return;
 
         if (istalking) {
-            recordingManager.writeStartTalking();
+            recordingManager.writeStartTalking(playerName);
         } else {
-            recordingManager.writeEndTalking();
+            recordingManager.writeEndTalking(playerName);
         }
     }
 }

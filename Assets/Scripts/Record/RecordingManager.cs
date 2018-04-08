@@ -272,12 +272,12 @@ public class RecordingManager : Photon.PunBehaviour {
         _wasBGazingALastFrame_Heads = IsAGazingB(heads[1], heads[0]);
     }
 
-    public void writeStartTalking() {
-        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",start talking");
+    public void writeStartTalking(string playername) {
+        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + playername + ",start talking");
     }
 
-    public void writeEndTalking() {
-        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",end talking");
+    public void writeEndTalking(string playername) {
+        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + playername +  ",end talking");
     }
 
 }
