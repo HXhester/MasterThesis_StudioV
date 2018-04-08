@@ -121,7 +121,10 @@ public class RecordingManager : Photon.PunBehaviour {
         string _audioFile = path + "audio_" + nameBase + ".txt";
         sw_mutualGaze = new StreamWriter(_eyeFilename);
         sw_otherLogForEyes = new StreamWriter(_otherLogEyes);
-        sw_otherLogForHeads = new StreamWriter(_otherLogHeads);
+
+        if (GameManager.Instance.UsingVR)
+            sw_otherLogForHeads = new StreamWriter(_otherLogHeads);
+
         sw_audio = new StreamWriter(_audioFile);
 
         IsRecording = true;
@@ -142,6 +145,9 @@ public class RecordingManager : Photon.PunBehaviour {
             _wasBGazingALastFrame_Eyes = true;
         }
 
+        if(!GameManager.Instance.UsingVR)
+            return;
+        
         if (IsAGazingB(Heads[0], Heads[1])) {
             sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",eyes," + Heads[0].name + ",starts gazing at " + Heads[1].name);
             _wasAGazingBLastFrame_Heads = true;

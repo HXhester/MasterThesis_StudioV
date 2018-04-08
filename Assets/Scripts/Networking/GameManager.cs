@@ -165,8 +165,14 @@ public class GameManager : Photon.PunBehaviour
     void startTalking() {
         if (!PhotonNetwork.inRoom)
             return;
-        var name = localAvatar.name;
-        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, name, true);
+        string playerName;
+        if (UsingVR) {
+            playerName = localAvatar.name;
+        }
+        else {
+            playerName = "Host";
+        }
+        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, playerName, true);
     }
     void endTalking() {
         if (!PhotonNetwork.inRoom)
