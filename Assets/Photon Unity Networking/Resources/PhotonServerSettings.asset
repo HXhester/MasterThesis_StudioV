@@ -77,4 +77,5 @@ MonoBehaviour:
   - RPC_TriggerUpdateDefinitions
   - RPC_UpdateDefinitions
   - RPC_SetVRMode
+  - RPC_WriteTalkingStatus
   DisableAutoOpenWizard: 1

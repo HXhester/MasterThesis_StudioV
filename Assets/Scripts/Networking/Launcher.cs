@@ -64,7 +64,12 @@ namespace Com.MTGTech.MyGame{
 			PhotonNetwork.LoadLevel (sceneToLoadText.text);
 		    GameManager.Instance.DyadType = DyadTypeText.text;
             if (PhotonNetwork.isMasterClient) {
-                GameManager.Instance.GetComponent<PhotonView>().RPC("RPC_SetVRMode", PhotonTargets.AllBuffered, isUsingVR.isOn);                
+                GameManager.Instance.GetComponent<PhotonView>().RPC("RPC_SetVRMode", PhotonTargets.AllBuffered, isUsingVR.isOn);
+                if (isUsingVR.isOn)
+                    MicInput.Instance.StopMicrophone();
+            } else {
+                if (!isUsingVR.isOn)
+                    MicInput.Instance.StopMicrophone();
             }
             
             if (!string.IsNullOrEmpty(skeletonName.text)) {

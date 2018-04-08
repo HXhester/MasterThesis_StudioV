@@ -151,12 +151,6 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",eyes," + Heads[1].name + ",starts gazing at " + Heads[0].name);
             _wasBGazingALastFrame_Heads = true;
         }
-
-        if (GameManager.Instance.IsTalking)
-        {
-            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",start talking");
-            _wasTalkingLastFrame = true;
-        }
     }
 
 
@@ -277,4 +271,13 @@ public class RecordingManager : Photon.PunBehaviour {
         }
         _wasBGazingALastFrame_Heads = IsAGazingB(heads[1], heads[0]);
     }
+
+    public void writeStartTalking() {
+        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",start talking");
+    }
+
+    public void writeEndTalking() {
+        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",end talking");
+    }
+
 }

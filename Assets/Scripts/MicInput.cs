@@ -16,6 +16,13 @@ public class MicInput : MonoBehaviour
     public bool isTalking;
 
     private string _device;
+    private bool _wasTalkingLastFrame;
+
+    public delegate void OnTalkingStartDelegate();
+    public static OnTalkingStartDelegate StartTalkingDelegate;
+
+    public delegate void OnTalkingEndDelegate();
+    public static OnTalkingEndDelegate EndTalkingDelegate;
 
     //mic initialization
     public void InitMic()
@@ -74,9 +81,17 @@ public class MicInput : MonoBehaviour
 
         isTalking = IsTalking();
 
-        Debug.Log(MicLoudness);
-        if (isTalking)
-            Debug.Log("talking");
+        if (!_wasTalkingLastFrame && isTalking) {
+            if(StartTalkingDelegate!=null)
+                StartTalkingDelegate();
+
+            _wasTalkingLastFrame = true;
+        } else if (_wasTalkingLastFrame && !isTalking) {
+            if (EndTalkingDelegate != null)
+                EndTalkingDelegate();
+
+            _wasTalkingLastFrame = false;
+        }
     }
 
     bool _isInitialized;
@@ -100,28 +115,27 @@ public class MicInput : MonoBehaviour
     }
 
 
-    // make sure the mic gets started & stopped when application gets focused
-    void OnApplicationFocus(bool focus)
-    {
-        if (focus)
-        {
-            //Debug.Log("Focus");
+    //// make sure the mic gets started & stopped when application gets focused
+    //void OnApplicationFocus(bool focus)
+    //{
+    //    if (focus)
+    //    {
+    //        //Debug.Log("Focus");
 
-            if (!_isInitialized)
-            {
-                //Debug.Log("Init Mic");
-                InitMic();
-            }
-        }
-        if (!focus)
-        {
-            //Debug.Log("Pause");
-            StopMicrophone();
-            //Debug.Log("Stop Mic");
-        }
-    }
+    //        if (!_isInitialized)
+    //        {
+    //            //Debug.Log("Init Mic");
+    //            InitMic();
+    //        }
+    //    }
+    //    if (!focus)
+    //    {
+    //        //Debug.Log("Pause");
+    //        StopMicrophone();
+    //        //Debug.Log("Stop Mic");
+    //    }
+    //}
 
-    // todo: delegate start talking; end talking
     bool IsTalking()
     {
         return MicLoudness > MinTalkLoudness;

@@ -16,6 +16,15 @@ public class GameManager : Photon.PunBehaviour
     public bool UsingVR;
     public bool IsTalking;
 
+    private void OnEnable() {
+        MicInput.StartTalkingDelegate += startTalking;
+        MicInput.EndTalkingDelegate += endTalking;
+    }
+    private void OnDisable() {
+        MicInput.StartTalkingDelegate -= startTalking;
+        MicInput.EndTalkingDelegate -= endTalking;
+    }
+
     private void Awake()
     {
         //Check if instance already exists
@@ -35,29 +44,16 @@ public class GameManager : Photon.PunBehaviour
         SceneManager.LoadScene(0);
     }
 
-    public void leaveRoom()
-    {
+    public void leaveRoom() {
         PhotonNetwork.LeaveRoom();
     }
+
 	void Start(){
-
-		DontDestroyOnLoad (gameObject);
-		    
-
-  //          if (PhotonNetwork.isMasterClient)
-		//	{
-		//		Transform faceController = GameObject.FindGameObjectWithTag ("ExpressionController").transform;
-		//		GameObject go = PhotonNetwork.Instantiate(PhotonNetwork.playerName, faceController.position, Quaternion.identity, 0);
-  //          }
-                    
-			
-		//}
-
-	    
+		DontDestroyOnLoad (gameObject);    
 	}
 	void Update()
 	{
-        // TODO: subscribe delegate and Send rpc to syn all game manager
+        // TODO: subscribe delegate and Send rpc to sync game manager
 	    IsTalking = MicInput.Instance.isTalking;
 	}
 
@@ -164,5 +160,26 @@ public class GameManager : Photon.PunBehaviour
 
         if (VRModeChangeDelegate != null)
             VRModeChangeDelegate();
+    }
+
+    void startTalking() {
+        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, true);
+    }
+    void endTalking() {
+        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, false);
+    }
+
+    [PunRPC]
+    void RPC_WriteTalkingStatus(bool istalking) {
+        var recordingManager = FindObjectOfType<RecordingManager>();
+
+        if (!recordingManager.IsRecording)
+            return;
+
+        if (istalking) {
+            recordingManager.writeStartTalking();
+        } else {
+            recordingManager.writeEndTalking();
+        }
     }
 }
