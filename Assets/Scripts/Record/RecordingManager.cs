@@ -15,6 +15,7 @@ public class RecordingManager : Photon.PunBehaviour {
     private StreamWriter sw_mutualGaze;
     public StreamWriter sw_otherLogForEyes;
     public StreamWriter sw_otherLogForHeads;
+    public StreamWriter sw_audio;
 
     public GameObject[]  Eyes;            // Left eye gameobjects on avatars
     public GameObject[] Heads;
@@ -26,6 +27,7 @@ public class RecordingManager : Photon.PunBehaviour {
     private bool _wasBGazingALastFrame_Eyes;
     private bool _wasAGazingBLastFrame_Heads;
     private bool _wasBGazingALastFrame_Heads;
+    private bool _wasTalkingLastFrame;
 
     [HideInInspector]
     public bool IsRecording = false;
@@ -116,15 +118,14 @@ public class RecordingManager : Photon.PunBehaviour {
         _eyeFilename = path + "EyeData_" + nameBase + ".txt";
         string _otherLogEyes = path + "OtherLogEyes_" + nameBase + ".txt";
         string _otherLogHeads = path + "OtherLogHeads_" + nameBase + ".txt";
+        string _audioFile = path + "audio_" + nameBase + ".txt";
         sw_mutualGaze = new StreamWriter(_eyeFilename);
         sw_otherLogForEyes = new StreamWriter(_otherLogEyes);
         sw_otherLogForHeads = new StreamWriter(_otherLogHeads);
+        sw_audio = new StreamWriter(_audioFile);
 
         IsRecording = true;
         //_worldTimer.StartTimer();
-        sw_mutualGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
-        sw_otherLogForEyes.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
-        sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Start recording");
 
         // ===============================Deal with at the begining if there is any mutual gaze=======================
         if (IsMutualGaze(Eyes[0], Eyes[1])) {
@@ -150,6 +151,12 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",eyes," + Heads[1].name + ",starts gazing at " + Heads[0].name);
             _wasBGazingALastFrame_Heads = true;
         }
+
+        if (GameManager.Instance.IsTalking)
+        {
+            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",start talking");
+            _wasTalkingLastFrame = true;
+        }
     }
 
 
@@ -170,6 +177,11 @@ public class RecordingManager : Photon.PunBehaviour {
         if (sw_otherLogForHeads != null) {
             sw_otherLogForHeads.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
             sw_otherLogForHeads.Close();
+        }
+
+        if (sw_audio != null)
+        {
+            sw_audio.Close();
         }
 
         //GetComponent<WorldTimer>().StopTimer();

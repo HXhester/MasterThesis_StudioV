@@ -14,6 +14,7 @@ public class GameManager : Photon.PunBehaviour
     public GameObject localAvatar;
     public string DyadType;
     public bool UsingVR;
+    public bool IsTalking;
 
     private void Awake()
     {
@@ -54,9 +55,12 @@ public class GameManager : Photon.PunBehaviour
 
 	    
 	}
-	void Update(){
-
+	void Update()
+	{
+        // TODO: subscribe delegate and Send rpc to syn all game manager
+	    IsTalking = MicInput.Instance.isTalking;
 	}
+
     public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
         if (PhotonNetwork.isMasterClient)
@@ -156,7 +160,6 @@ public class GameManager : Photon.PunBehaviour
     void RPC_SetVRMode(bool isUsingVR) {
         GameManager.Instance.UsingVR = isUsingVR;
         Debug.Log("vr mode is: " + isUsingVR);
-        // TODO: test if this disable vr
         XRSettings.enabled = isUsingVR;
 
         if (VRModeChangeDelegate != null)
