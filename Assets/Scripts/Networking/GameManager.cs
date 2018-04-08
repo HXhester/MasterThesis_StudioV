@@ -163,9 +163,15 @@ public class GameManager : Photon.PunBehaviour
     }
 
     void startTalking() {
+        if (!PhotonNetwork.inRoom)
+            return;
+
         photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, true);
     }
     void endTalking() {
+        if (!PhotonNetwork.inRoom)
+            return;
+
         photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, false);
     }
 
