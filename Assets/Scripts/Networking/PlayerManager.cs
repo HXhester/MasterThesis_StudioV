@@ -132,9 +132,13 @@ public class PlayerManager : Photon.PunBehaviour
                 Camera.GetComponent<Camera>().enabled = false;
 
                 // Don't render hmd layer
-                var headCam = OptitrackHead.gameObject.AddComponent<Camera>();
-                headCam.nearClipPlane = 0.01f;
-                headCam.cullingMask &= ~(1 << LayerMask.NameToLayer("HMD"));
+                var headCam = new GameObject("HeadCam");
+                var headcamComponent = headCam.AddComponent<Camera>();
+                headCam.transform.parent = OptitrackHead;
+                headCam.transform.localPosition = new Vector3(0,0,0.13f);
+
+                headcamComponent.nearClipPlane = 0.01f;
+                headcamComponent.cullingMask &= ~(1 << LayerMask.NameToLayer("HMD"));
             }
             
 
