@@ -54,6 +54,9 @@ public class PlayerManager : Photon.PunBehaviour
             } catch (System.Exception) {
                 Camera = cameraRig.Find("Camera (eye)").gameObject;
             }
+
+            // Disable hitmesh box on local avatar
+            GetComponentInChildren<SetHeadPos>().transform.Find("EyeBox").gameObject.SetActive(false);
         }
     }
 

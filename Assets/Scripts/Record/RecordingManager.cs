@@ -25,10 +25,9 @@ public class RecordingManager : Photon.PunBehaviour {
     public StreamWriter sw_audio;                       // Record the loudness each frame; May be do it manually
     
     private WorldTimer _worldTimer;
-    private bool _isMutualGazeInLastFrame;
-    private bool _isMutualGazeInLastFrame_Head;
     private bool _wasAGazingBLastFrame_Eyes;
     private bool _wasAGazingBLastFrame_Heads;
+    private bool _wasAGazingBLastFrame_EyeHitMesh;
     private bool _wasTalkingLastFrame;
 
     [HideInInspector]
@@ -54,6 +53,16 @@ public class RecordingManager : Photon.PunBehaviour {
             }
             
             sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + MicInput.Instance.MicLoudness);           
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // Use raycast hit for checking if there is any eye mesh hit
+        if (!PhotonNetwork.isMasterClient && photonView.isMine && IsRecording)
+        {
+            if (GameManager.Instance.UsingVR)
+                LogEyeGazeHitMesh(sw_individualEyeGaze_HitMesh,GameManager.Instance.localEye);
         }
     }
 
@@ -93,7 +102,7 @@ public class RecordingManager : Photon.PunBehaviour {
 
         // ===============================Deal with at the begining of recording=======================
         if (IsAGazingB(GameManager.Instance.localEye, GameManager.Instance.remoteEye)) {
-            sw_individualEyeGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing");
+            sw_individualEyeGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts eye gazing");
             _wasAGazingBLastFrame_Eyes = true;
         }
 
@@ -101,8 +110,14 @@ public class RecordingManager : Photon.PunBehaviour {
             return;
         
         if (IsAGazingB(GameManager.Instance.localHead, GameManager.Instance.remoteHead)) {
-            sw_individualHeadGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing");
+            sw_individualHeadGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts head gazing");
             _wasAGazingBLastFrame_Heads = true;
+        }
+
+        if (IsAGazingB_hitmesh(GameManager.Instance.localEye.transform))
+        {
+            sw_individualEyeGaze_HitMesh.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing on eye mesh");
+            _wasAGazingBLastFrame_EyeHitMesh = true;
         }
     }
 
@@ -126,11 +141,66 @@ public class RecordingManager : Photon.PunBehaviour {
         }
     }
 
+    void LogOtherBehavioursEyes(StreamWriter sw, GameObject localEye, GameObject remoteEye)
+    {
+        if (!_wasAGazingBLastFrame_Eyes && IsAGazingB(localEye, remoteEye))
+        {
+            
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts eye gazing");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts eye gazing");
+
+
+        }
+        else if (_wasAGazingBLastFrame_Eyes && !IsAGazingB(localEye, remoteEye))
+        {
+            
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",eye gaze ends");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",eye gaze ends");
+            
+        }
+        _wasAGazingBLastFrame_Eyes = IsAGazingB(localEye, remoteEye);
+    }
+
+    void LogOtherBehavioursHeads(StreamWriter sw, GameObject localHead, GameObject remoteHead) {
+        if (!_wasAGazingBLastFrame_Heads && IsAGazingB(localHead, remoteHead)) {
+            
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts head gazing");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts head gazing");
+            
+        }
+        else if (_wasAGazingBLastFrame_Heads && !IsAGazingB(localHead, remoteHead)) {
+            
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",head gaze ends");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",head gaze ends");
+            
+        }
+        _wasAGazingBLastFrame_Heads = IsAGazingB(localHead, remoteHead);
+    }
+
+    void LogEyeGazeHitMesh(StreamWriter sw, GameObject localEye)
+    {
+        if (!_wasAGazingBLastFrame_EyeHitMesh && IsAGazingB_hitmesh(localEye.transform))
+        {
+
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing on eye mesh");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing on eye mesh");
+
+        }
+        else if (_wasAGazingBLastFrame_EyeHitMesh && !IsAGazingB_hitmesh(localEye.transform))
+        {
+
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",ends gazing on eye mesh");
+            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",ends gazing on eye mesh");
+
+        }
+        _wasAGazingBLastFrame_EyeHitMesh = IsAGazingB_hitmesh(localEye.transform);
+    }
+
     bool IsMutualGaze(GameObject eye1, GameObject eye2)
     {
         // if angle between vector eye.forward and eye-eye vector < 9°, then is gazing       
-       
-        return IsAGazingB(eye1,eye2) && IsAGazingB(eye2, eye1);
+
+        return IsAGazingB(eye1, eye2) && IsAGazingB(eye2, eye1);
     }
 
     bool IsAGazingB(GameObject a, GameObject b)
@@ -145,47 +215,21 @@ public class RecordingManager : Photon.PunBehaviour {
         return Mathf.Abs(angle) < 9f;
     }
 
-    void LogOtherBehavioursEyes(StreamWriter sw, GameObject localEye, GameObject remoteEye)
+    bool IsAGazingB_hitmesh(Transform eye)
     {
-        if (!_wasAGazingBLastFrame_Eyes && IsAGazingB(localEye, remoteEye))
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, eye.forward, out hit))
         {
-            
-            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing");
-            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds +",One-way gaze starts");
-            
+            if (hit.transform.name == "EyeBox")
+            {
+                Debug.Log("hit on eye!");
+                return true;
+            }
+                
+            else
+                return false;
         }
-        else if (_wasAGazingBLastFrame_Eyes && !IsAGazingB(localEye, remoteEye))
-        {
-            
-            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",One-way gaze ends");
-            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",One-way gaze ends");
-            
-        }
-        _wasAGazingBLastFrame_Eyes = IsAGazingB(localEye, remoteEye);
+        return false;
     }
-
-    void LogOtherBehavioursHeads(StreamWriter sw, GameObject localHead, GameObject remoteHead) {
-        if (!_wasAGazingBLastFrame_Heads && IsAGazingB(localHead, remoteHead)) {
-            
-            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts gazing");
-            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",One-way gaze starts");
-            
-        }
-        else if (_wasAGazingBLastFrame_Heads && !IsAGazingB(localHead, remoteHead)) {
-            
-            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",One-way gaze ends");
-            Debug.Log(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",One-way gaze ends");
-            
-        }
-        _wasAGazingBLastFrame_Heads = IsAGazingB(localHead, remoteHead);
-    }
-
-    public void writeStartTalking(string playername) {
-        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds +","+ playername + ",start talking");
-    }
-
-    public void writeEndTalking(string playername) {
-        sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds +","+ playername +  ",end talking");
-    }
-
 }

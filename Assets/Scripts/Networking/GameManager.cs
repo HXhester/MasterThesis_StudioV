@@ -20,15 +20,6 @@ public class GameManager : Photon.PunBehaviour
     public GameObject localHead;
     public GameObject remoteHead;
 
-    private void OnEnable() {
-        MicInput.StartTalkingDelegate += startTalking;
-        MicInput.EndTalkingDelegate += endTalking;
-    }
-    private void OnDisable() {
-        MicInput.StartTalkingDelegate -= startTalking;
-        MicInput.EndTalkingDelegate -= endTalking;
-    }
-
     private void Awake()
     {
         //Check if instance already exists
@@ -159,44 +150,5 @@ public class GameManager : Photon.PunBehaviour
 
         if (VRModeChangeDelegate != null)
             VRModeChangeDelegate();
-    }
-
-    void startTalking() {
-        if (!PhotonNetwork.inRoom)
-            return;
-        string playerName;
-        if (UsingVR) {
-            playerName = localAvatar.name;
-        }
-        else {
-            playerName = "Host";
-        }
-        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, playerName, true);
-    }
-    void endTalking() {
-        if (!PhotonNetwork.inRoom)
-            return;
-        string playerName;
-        if (UsingVR) {
-            playerName = localAvatar.name;
-        }
-        else {
-            playerName = "Host";
-        }
-        photonView.RPC("RPC_WriteTalkingStatus", PhotonTargets.MasterClient, playerName, false);
-    }
-
-    [PunRPC]
-    void RPC_WriteTalkingStatus(string playerName, bool istalking) {
-        var recordingManager = FindObjectOfType<RecordingManager>();
-
-        if (!recordingManager.IsRecording)
-            return;
-
-        if (istalking) {
-            recordingManager.writeStartTalking(playerName);
-        } else {
-            recordingManager.writeEndTalking(playerName);
-        }
     }
 }

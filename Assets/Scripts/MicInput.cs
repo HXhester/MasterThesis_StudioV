@@ -11,18 +11,9 @@ public class MicInput : MonoBehaviour
     #endregion
 
     public int MicID = 0;
-    public float MinTalkLoudness = 0.001f;
     public float MicLoudness;
-    public bool isTalking;
 
     private string _device;
-    private bool _wasTalkingLastFrame;
-
-    public delegate void OnTalkingStartDelegate();
-    public static OnTalkingStartDelegate StartTalkingDelegate;
-
-    public delegate void OnTalkingEndDelegate();
-    public static OnTalkingEndDelegate EndTalkingDelegate;
 
     //mic initialization
     public void InitMic()
@@ -78,20 +69,6 @@ public class MicInput : MonoBehaviour
         // levelMax equals to the highest normalized value power 2, a small number because < 1
         // pass the value to a static var so we can access it from anywhere
         MicLoudness = MicrophoneLevelMax();
-
-        isTalking = IsTalking();
-
-        if (!_wasTalkingLastFrame && isTalking) {
-            if(StartTalkingDelegate!=null)
-                StartTalkingDelegate();
-
-            _wasTalkingLastFrame = true;
-        } else if (_wasTalkingLastFrame && !isTalking) {
-            if (EndTalkingDelegate != null)
-                EndTalkingDelegate();
-
-            _wasTalkingLastFrame = false;
-        }
     }
 
     bool _isInitialized;
@@ -136,8 +113,4 @@ public class MicInput : MonoBehaviour
     //    }
     //}
 
-    bool IsTalking()
-    {
-        return MicLoudness > MinTalkLoudness;
-    }
 }
