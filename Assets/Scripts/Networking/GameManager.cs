@@ -14,7 +14,11 @@ public class GameManager : Photon.PunBehaviour
     public GameObject localAvatar;
     public string DyadType;
     public bool UsingVR;
-    public bool IsTalking;
+
+    public GameObject localEye;
+    public GameObject remoteEye;
+    public GameObject localHead;
+    public GameObject remoteHead;
 
     private void OnEnable() {
         MicInput.StartTalkingDelegate += startTalking;
@@ -50,11 +54,6 @@ public class GameManager : Photon.PunBehaviour
 
 	void Start(){
 		DontDestroyOnLoad (gameObject);    
-	}
-	void Update()
-	{
-        // TODO: subscribe delegate and Send rpc to sync game manager
-	    IsTalking = MicInput.Instance.isTalking;
 	}
 
     public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)

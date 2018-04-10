@@ -209,19 +209,16 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public void StartGame()
     {
         photonView.RPC("RPC_StartGame", PhotonTargets.All);
-        //RPC_StartGame(_inGameRatingUI);
-        _recordingManager.StartRecording();
+        photonView.RPC("RPC_StartRecording",PhotonTargets.Others);
 
         Debug.Log("20 Questions game Start!");
     }
 
     public void StopGame()
     {
-        // TODO: uncomment this line
         photonView.RPC("RPC_StopGame", PhotonTargets.All);
-        //RPC_StopGame();
+        photonView.RPC("RPC_StopRecording", PhotonTargets.Others);
 
-        _recordingManager.StopRecording();
         Debug.Log("20 Questions game Stop!");
     }
 
@@ -245,6 +242,20 @@ public class SceneManager_Game : Photon.MonoBehaviour
         GameObject.Find("StartButton").GetComponent<Button>().interactable = true;
         _worldTimer.StopTimer();
         _worldTimer.ResetTimer();
+    }
+
+    [PunRPC]
+    void RPC_StartRecording()
+    {
+        var recordingManager = FindObjectOfType<RecordingManager>();
+        recordingManager.StartRecording();
+    }
+
+    [PunRPC]
+    void RPC_StopRecording()
+    {
+        var recordingManager = FindObjectOfType<RecordingManager>();
+        recordingManager.StopRecording();
     }
 
     // Call on space key press during "20 Questions"
@@ -285,8 +296,6 @@ public class SceneManager_Game : Photon.MonoBehaviour
             _board1.GetComponent<Text>().text = "It's your turn to guess.";
             _board2.GetComponent<Text>().text = category + ":" + word;
         }
-
-        Log20QuesionGame();
     }
 
     [PunRPC]
@@ -345,6 +354,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// For recording when boards switch status, not being used...
+    /// </summary>
     void Log20QuesionGame()
     {
         if (PhotonNetwork.isMasterClient)
@@ -369,11 +382,11 @@ public class SceneManager_Game : Photon.MonoBehaviour
             var dist2 = (board.transform.position - _avatarHeads[1].transform.position).magnitude;
             if (dist1 > dist2)
             {
-                recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[0].name + ",is guessing");
+                //recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[0].name + ",is guessing");
             }
             else
             {
-                recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[1].name + ",is guessing");
+                //recordingManager.sw_otherLogForEyes.WriteLine(worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + _avatars[1].name + ",is guessing");
             }
         }
     }

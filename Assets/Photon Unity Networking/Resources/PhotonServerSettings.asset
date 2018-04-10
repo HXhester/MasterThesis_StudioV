@@ -78,4 +78,6 @@ MonoBehaviour:
   - RPC_UpdateDefinitions
   - RPC_SetVRMode
   - RPC_WriteTalkingStatus
+  - RPC_StartRecording
+  - RPC_StopRecording
   DisableAutoOpenWizard: 1

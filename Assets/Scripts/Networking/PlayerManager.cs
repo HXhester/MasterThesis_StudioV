@@ -17,84 +17,44 @@ public class PlayerManager : Photon.PunBehaviour
     [Header("Remote")]
     public OptitrackSkeletonAnimator remoteOptitrackAnimator; //used in gamemanager to set skeleton name on all clients
     public Transform OptitrackHead;
-
-    private GameObject[] eyes;
-    private GameObject[] eyeOrigs;
+    public Transform eye;
 
     void OnEnable() {
         gameObject.name += photonView.viewID.ToString();
         _sceneManager = FindObjectOfType<SceneManager_Game>();
         if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
+        {
             _sceneManager.Has2Avatars = true;
+        }
+        
 
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
         GameManager.VRModeChangeDelegate += DealWithVRmodeChange;
 
+        // Master client
+        if (PhotonNetwork.isMasterClient)
+        {
+            if (GameManager.Instance.UsingVR)
+            {
+                localOptitrackAnimator.gameObject.SetActive(true);
+                remoteOptitrackAnimator.gameObject.SetActive(false);
+            }
+            else
+            {
+                localOptitrackAnimator.gameObject.SetActive(false);
+                remoteOptitrackAnimator.gameObject.SetActive(true);
+            }
+        }
+
+        // For local avatar client
         if (photonView.isMine && !PhotonNetwork.isMasterClient) {
             var cameraRig = GameObject.Find("[CameraRig]").transform;
             try {
                 Camera = cameraRig.Find("Camera (head)").Find("Camera (eye)").gameObject;
-                //listener = cameraRig.Find("Camera (head)").Find("Camera (ears)").GetComponent<AudioListener>();
             } catch (System.Exception) {
                 Camera = cameraRig.Find("Camera (eye)").gameObject;
-                //listener = cameraRig.Find("Camera (eye)").Find("Camera (ears)").GetComponent<AudioListener>();
             }
         }
-
-        // Master client should have HMD avatar enable to collect correct data
-        if (PhotonNetwork.isMasterClient) {
-            if (GameManager.Instance.UsingVR) {
-                localOptitrackAnimator.gameObject.SetActive(true);
-                remoteOptitrackAnimator.gameObject.SetActive(false);
-                eyes = GameObject.FindGameObjectsWithTag("EyeMesh");
-                //TODO: only for testing, need to remove
-                //eyes = new GameObject[2] { eyes[1], eyes[2] };         
-            }
-            else {
-                localOptitrackAnimator.gameObject.SetActive(false);
-                remoteOptitrackAnimator.gameObject.SetActive(true);
-
-                GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
-                GetComponent<FacialController>().enabled = false;
-                GetComponent<EyeController>().enabled = false;
-
-                eyes = GameObject.FindGameObjectsWithTag("OptitrackHead");
-            }
-
-            if (eyes.Length == 2) {
-                Debug.Log("find eyes");
-
-                eyeOrigs = new GameObject[2];
-                for (int i = 0; i < eyes.Length; i++) {
-
-                    var eyeOrig = new GameObject("EyeOrig");
-                    eyeOrig.transform.SetParent(eyes[i].transform.parent);
-                    StartCoroutine(ChangeEyeOrigName(eyeOrig));
-
-                    if (GameManager.Instance.UsingVR) {
-                        eyeOrig.transform.localPosition = new Vector3(0, eyes[i].transform.localPosition.y, eyes[i].transform.localPosition.z);
-                    }
-                    else {
-                        eyeOrig.transform.localPosition = eyes[i].transform.localPosition;
-                    }
-
-                    eyeOrigs[i] = eyeOrig;
-
-                    var raycaster = eyes[i].AddComponent<EyeRaycaster>();
-                    if (raycaster != null)
-                        raycaster.eyeOrig = eyeOrig;
-                }
-
-                FindObjectOfType<RecordingManager>().Eyes = eyeOrigs;
-                FindObjectOfType<RecordingManager>().AvatarsReady = true;
-                var heads = GameObject.FindGameObjectsWithTag("HMDHead");
-                foreach (GameObject head in heads) {
-                    head.name = head.transform.parent.name;
-                }
-                FindObjectOfType<RecordingManager>().Heads = heads;
-            }
-        }
-
     }
 
     void OnDisable() {
@@ -108,71 +68,96 @@ public class PlayerManager : Photon.PunBehaviour
         ToggleAvatarUI();
 
         //If the spawned avatar is mine, only deal with avatar client
-        if (photonView.isMine && !PhotonNetwork.isMasterClient)
-        {
-            // if using vr, then only see local avatar
-            if (GameManager.Instance.UsingVR)
-            {
-                Debug.Log("is using vr");
-                localOptitrackAnimator.gameObject.SetActive(true);
-                remoteOptitrackAnimator.gameObject.SetActive(false);
+        if (PhotonNetwork.isMasterClient)
+            return;
 
-                Camera.GetComponent<SteamVR_Camera>().enabled = true;
-                Camera.GetComponent<Camera>().enabled = true;
-                // Don't render the remote layer
-                Camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
+        // if using vr, then only see local avatar
+        if (GameManager.Instance.UsingVR)
+        {
+            Debug.Log("is using vr");
+            localOptitrackAnimator.gameObject.SetActive(true);
+            remoteOptitrackAnimator.gameObject.SetActive(false);
+
+            Camera.GetComponent<SteamVR_Camera>().enabled = true;
+            Camera.GetComponent<Camera>().enabled = true;
+            // Don't render the remote layer
+            Camera.GetComponent<Camera>().cullingMask &= ~(1 << LayerMask.NameToLayer("Remote"));
+            if (photonView.isMine)
+            {
+
+                // TODO: tests if skeleton animator works or not
+                //localOptitrackAnimator.enabled = false;
+                //remoteOptitrackAnimator.enabled = false;
+
+                GameManager.Instance.localEye = eye.gameObject;
+                GameManager.Instance.localHead = GetComponentInChildren<SetHeadPos>().gameObject;
+
+                var eyeOrig = new GameObject("EyeOrig");
+                eyeOrig.transform.SetParent(eye.transform.parent);
+                StartCoroutine(ChangeEyeOrigName(eyeOrig));
+                eyeOrig.transform.localPosition = new Vector3(0, eye.transform.localPosition.y, eye.transform.localPosition.z);
+                var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
+                if (raycaster != null)
+                {
+                    raycaster.eyeOrig = eyeOrig;
+                    raycaster.followedObj = eye.gameObject;
+                }
+                
+
+                var overviewcam = GameObject.FindGameObjectWithTag("CameraClientPickup");
+                if (overviewcam != null)
+                    overviewcam.GetComponent<Camera>().enabled = false;
             }
-            // if not using vr, then see the remote one
             else
             {
-                localOptitrackAnimator.gameObject.SetActive(false);
-                remoteOptitrackAnimator.gameObject.SetActive(true);
+                GameManager.Instance.remoteEye = eye.gameObject;
+                GameManager.Instance.remoteHead = OptitrackHead.gameObject;
+            }
 
-                Camera.GetComponent<SteamVR_Camera>().enabled = false;
-                Camera.GetComponent<Camera>().enabled = false;
+        }
+        // if not using vr, then see the remote one
+        else
+        {
+            localOptitrackAnimator.gameObject.SetActive(false);
+            remoteOptitrackAnimator.gameObject.SetActive(true);
 
+            Camera.GetComponent<SteamVR_Camera>().enabled = false;
+            Camera.GetComponent<Camera>().enabled = false;
+
+            GetComponentInChildren<SetHeadPos>().gameObject.SetActive(false);
+            GetComponent<FacialController>().enabled = false;
+            GetComponent<EyeController>().enabled = false;
+
+            if (photonView.isMine)
+            {
                 // Don't render hmd layer
                 var headCam = new GameObject("HeadCam");
                 var headcamComponent = headCam.AddComponent<Camera>();
                 headCam.transform.parent = OptitrackHead;
-                headCam.transform.localPosition = new Vector3(0,0,0.13f);
+                headCam.transform.localPosition = new Vector3(0, 0, 0.13f);
 
                 headcamComponent.nearClipPlane = 0.01f;
                 headcamComponent.cullingMask &= ~(1 << LayerMask.NameToLayer("HMD"));
-            }
-            
 
-            localOptitrackAnimator.enabled = false;
-            remoteOptitrackAnimator.enabled = false;
-
-            //Not necessary if remoteavatar is already set to layer Remote in the prefab..
-            //SetLayerTo(this, "Remote");
-
-            var overviewcam = GameObject.FindGameObjectWithTag("CameraClientPickup");
-            if (overviewcam != null)
-                overviewcam.GetComponent<Camera>().enabled = false;
-        }
-        else
-        {
-            //Turn LocalAvatar off and RemoteAvatar on for all the non-avatar clients
-            
-            //Find the other avatar clients and tell them to set the newly spawned RemoteAvatar to Remote Layer - this is done because every avatar should see the local avatars in order to have synced positions
-            GameObject[] avatars = GameObject.FindGameObjectsWithTag("Avatar");
-
-            bool usingVR = GameManager.Instance.UsingVR;
-            foreach (GameObject g in avatars)
-            {
-                if (g.GetPhotonView().isMine)
+                var eyeOrig = new GameObject("EyeOrig");
+                eyeOrig.transform.SetParent(OptitrackHead.transform.parent);
+                StartCoroutine(ChangeEyeOrigName(eyeOrig));
+                eyeOrig.transform.localPosition = OptitrackHead.transform.localPosition;
+                var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
+                if (raycaster != null)
                 {
-					g.GetComponent<PlayerManager>().localOptitrackAnimator.gameObject.SetActive(usingVR);
-					g.GetComponent<PlayerManager>().remoteOptitrackAnimator.gameObject.SetActive(!usingVR);
-					//if the other avatar is mine then return. if no avatar is mine continue to show only remote/optitrack gameObject.
-					return;
+                    raycaster.followedObj = OptitrackHead.gameObject;
+                    raycaster.eyeOrig = eyeOrig;
                 }
+
+                GameManager.Instance.localHead = OptitrackHead.gameObject;
             }
-            //localOptitrackAnimator.gameObject.SetActive(false);
-            //remoteOptitrackAnimator.gameObject.SetActive(true);
-        } 
+            else
+            {
+                GameManager.Instance.remoteHead = OptitrackHead.gameObject;
+            }
+
+        }
     }
 
     void ToggleAvatarUI() {
@@ -181,20 +166,6 @@ public class PlayerManager : Photon.PunBehaviour
         Debug.Log("is using vr: " + usingvr);
         foreach (GameObject go in avatarUi) {
             go.GetComponent<Canvas>().enabled = usingvr;
-        }
-    }
-
-    void Update()
-    {
-        if (!PhotonNetwork.isMasterClient)
-            return;
-
-        if (eyes.Length!=2)
-            return;
-        
-        for (int i = 0; i < eyes.Length; i++)
-        {
-            eyeOrigs[i].transform.rotation = eyes[i].transform.rotation;
         }
     }
 
