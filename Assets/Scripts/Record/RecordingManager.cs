@@ -221,7 +221,6 @@ public class RecordingManager : Photon.PunBehaviour {
 
         if (Physics.Raycast(eye.position, eye.forward, out hit))
         {
-            Debug.Log(hit.transform.name);
             if (hit.transform.name == "EyeBox")
             {
                 Debug.Log("hit on eye!");
