@@ -95,10 +95,18 @@ public class PlayerManager : Photon.PunBehaviour
                 //should be camera(eye)
                 GameManager.Instance.localEye = Camera;
                 GameManager.Instance.localHead = GetComponentInChildren<SetHeadPos>().gameObject;
+                var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                foreach (GameObject avatar in avatars) {
+                    if (!avatar.GetComponent<PhotonView>().isMine) {
+                        GameManager.Instance.remoteEye = avatar.GetComponent<PlayerManager>().eye.gameObject;
+                        GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().transform.GetComponentInChildren<SetHeadPos>().gameObject;
+                    }
+                }
+                
 
                 var eyeOrig = new GameObject("EyeOrig");
                 eyeOrig.transform.SetParent(Camera.transform);
-                StartCoroutine(ChangeEyeOrigName(eyeOrig));
+                eyeOrig.name = GameManager.Instance.localAvatar.name;
                 eyeOrig.transform.localPosition = Vector3.zero;
                 var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
                 if (raycaster != null)
@@ -110,12 +118,6 @@ public class PlayerManager : Photon.PunBehaviour
                 var overviewcam = GameObject.FindGameObjectWithTag("CameraClientPickup");
                 if (overviewcam != null)
                     overviewcam.GetComponent<Camera>().enabled = false;
-            }
-            else
-            {
-                Debug.Log("for remote avatar");
-                GameManager.Instance.remoteEye = eye.gameObject;
-                GameManager.Instance.remoteHead = OptitrackHead.gameObject;
             }
 
         }
@@ -145,20 +147,21 @@ public class PlayerManager : Photon.PunBehaviour
 
                 var eyeOrig = new GameObject("EyeOrig");
                 eyeOrig.transform.SetParent(OptitrackHead.transform.parent);
-                StartCoroutine(ChangeEyeOrigName(eyeOrig));
+                eyeOrig.name = GameManager.Instance.localAvatar.name;
                 eyeOrig.transform.localPosition = OptitrackHead.transform.localPosition;
                 var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
                 if (raycaster != null)
                 {
-                    raycaster.followedObj = OptitrackHead.gameObject;
                     raycaster.eyeOrig = eyeOrig;
                 }
 
                 GameManager.Instance.localHead = OptitrackHead.gameObject;
-            }
-            else
-            {
-                GameManager.Instance.remoteHead = OptitrackHead.gameObject;
+                var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                foreach (GameObject avatar in avatars) {
+                    if (!avatar.GetComponent<PhotonView>().isMine) {
+                        GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                    }
+                }
             }
 
         }
@@ -248,16 +251,4 @@ public class PlayerManager : Photon.PunBehaviour
             GameObject.Find(playerName).GetComponentInChildren<SetHeadPos>().origHeadToEyeVector *= scale;
     }
 
-    IEnumerator ChangeEyeOrigName(GameObject eyeOrig)
-    {
-        Debug.Log("change eye orig name coroutin starts");
-        Transform parent = eyeOrig.transform.parent;
-        while (parent.tag != "Avatar")
-        {
-            parent = parent.parent;
-            yield return new WaitForEndOfFrame();
-        }
-
-        eyeOrig.name = parent.name;
-    }
 }
