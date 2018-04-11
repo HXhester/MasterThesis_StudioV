@@ -11,7 +11,6 @@ public class EyeRaycaster : MonoBehaviour {
     //public RaycastHit eyeHit;
     public KeyCode ToggleVisualizerKey = KeyCode.F12;
     public GameObject eyeOrig;
-    public GameObject followedObj;
 
     private bool rayToggler;
     
@@ -21,7 +20,6 @@ public class EyeRaycaster : MonoBehaviour {
         if(eyeOrig == null)
             return;
 
-        transform.localRotation = followedObj.transform.localRotation;
         //var ray = new Ray(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection);
         //RaycastHit info;
         //Physics.Raycast(ray, out info, m_RayLength);

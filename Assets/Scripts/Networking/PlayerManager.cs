@@ -91,19 +91,19 @@ public class PlayerManager : Photon.PunBehaviour
                 // TODO: tests if skeleton animator works or not
                 //localOptitrackAnimator.enabled = false;
                 //remoteOptitrackAnimator.enabled = false;
-
-                GameManager.Instance.localEye = eye.gameObject;
+                
+                //should be camera(eye)
+                GameManager.Instance.localEye = Camera;
                 GameManager.Instance.localHead = GetComponentInChildren<SetHeadPos>().gameObject;
 
                 var eyeOrig = new GameObject("EyeOrig");
-                eyeOrig.transform.SetParent(eye.transform.parent);
+                eyeOrig.transform.SetParent(Camera.transform);
                 StartCoroutine(ChangeEyeOrigName(eyeOrig));
-                eyeOrig.transform.localPosition = new Vector3(0, eye.transform.localPosition.y, eye.transform.localPosition.z);
+                eyeOrig.transform.localPosition = Vector3.zero;
                 var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
                 if (raycaster != null)
                 {
                     raycaster.eyeOrig = eyeOrig;
-                    raycaster.followedObj = eye.gameObject;
                 }
                 
 
@@ -113,6 +113,7 @@ public class PlayerManager : Photon.PunBehaviour
             }
             else
             {
+                Debug.Log("for remote avatar");
                 GameManager.Instance.remoteEye = eye.gameObject;
                 GameManager.Instance.remoteHead = OptitrackHead.gameObject;
             }
