@@ -151,4 +151,9 @@ public class GameManager : Photon.PunBehaviour
         if (VRModeChangeDelegate != null)
             VRModeChangeDelegate();
     }
+
+    [PunRPC]
+    void RPC_SetDyadType(string type) {
+        GameManager.Instance.DyadType = type;
+    }
 }

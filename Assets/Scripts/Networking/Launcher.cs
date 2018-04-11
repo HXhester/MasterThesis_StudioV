@@ -62,9 +62,9 @@ namespace Com.MTGTech.MyGame{
 		public override void OnJoinedRoom ()
 		{
 			PhotonNetwork.LoadLevel (sceneToLoadText.text);
-		    GameManager.Instance.DyadType = DyadTypeText.text;
             if (PhotonNetwork.isMasterClient) {
                 GameManager.Instance.GetComponent<PhotonView>().RPC("RPC_SetVRMode", PhotonTargets.AllBuffered, isUsingVR.isOn);
+                GameManager.Instance.GetComponent<PhotonView>().RPC("RPC_SetDyadType", PhotonTargets.AllBuffered, DyadTypeText.text);
                 MicInput.Instance.StopMicrophone();                   
             }
             

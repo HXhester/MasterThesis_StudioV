@@ -238,7 +238,7 @@ public class PlayerManager : Photon.PunBehaviour
     [PunRPC]
     void SetParent(string playerName)
     {
-
+        expressionController = FindObjectOfType<FaceExpressionController>().transform;
         GameObject player = GameObject.Find(playerName);
         player.transform.parent = expressionController.transform;
     }

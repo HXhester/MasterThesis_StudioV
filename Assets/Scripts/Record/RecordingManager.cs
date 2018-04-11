@@ -40,7 +40,7 @@ public class RecordingManager : Photon.PunBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (!PhotonNetwork.isMasterClient && photonView.isMine && IsRecording)
+        if (!PhotonNetwork.isMasterClient && IsRecording)
         {
             // TODO: Log eye gaze behavior using hitmesh method         
             // ==========================Recording for one-way gaze=====================================
@@ -59,7 +59,7 @@ public class RecordingManager : Photon.PunBehaviour {
     void FixedUpdate()
     {
         // Use raycast hit for checking if there is any eye mesh hit
-        if (!PhotonNetwork.isMasterClient && photonView.isMine && IsRecording)
+        if (!PhotonNetwork.isMasterClient && IsRecording)
         {
             if (GameManager.Instance.UsingVR)
                 LogEyeGazeHitMesh(sw_individualEyeGaze_HitMesh,GameManager.Instance.localEye);
