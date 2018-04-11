@@ -135,8 +135,14 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_individualHeadGaze.Close();
         }
 
+        if (sw_individualEyeGaze_HitMesh != null) {
+            sw_individualEyeGaze_HitMesh.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
+            sw_individualEyeGaze_HitMesh.Close();
+        }
+
         if (sw_audio != null)
         {
+            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
             sw_audio.Close();
         }
     }
