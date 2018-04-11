@@ -1,0 +1,4 @@
+5.105992,starts head gazing
+5.4392972,head gaze ends
+7.6642479,starts head gazing
+30.0384084,Stop recording

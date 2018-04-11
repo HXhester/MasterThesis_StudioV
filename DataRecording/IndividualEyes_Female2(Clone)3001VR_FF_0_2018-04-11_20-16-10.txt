@@ -1,0 +1,7 @@
+5.0921309,starts eye gazing
+5.4242842,eye gaze ends
+7.6642479,starts eye gazing
+26.9826431,eye gaze ends
+26.9970951,starts eye gazing
+27.0401383,eye gaze ends
+30.0384084,Stop recording
