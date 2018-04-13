@@ -19,6 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4767510253779568}
+  - component: {fileID: 114841640251495970}
   m_Layer: 0
   m_Name: GazeIndicator
   m_TagString: Untagged
@@ -50,7 +51,7 @@ Transform:
   m_GameObject: {fileID: 1675225836463302}
   m_LocalRotation: {x: -0, y: 0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 12, y: 12, z: 1}
   m_Children: []
   m_Father: {fileID: 4767510253779568}
   m_RootOrder: 0
@@ -63,12 +64,26 @@ Transform:
   m_GameObject: {fileID: 1327335915232350}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 12, y: 12, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4135095332783846}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114841640251495970
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1327335915232350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e74f31d20d023245be26bb9d0a18067, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GazeIndicator: {fileID: 1327335915232350}
+  ball1: {fileID: 0}
+  ball2: {fileID: 0}
 --- !u!212 &212021327354275006
 SpriteRenderer:
   m_ObjectHideFlags: 1

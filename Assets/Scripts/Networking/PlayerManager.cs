@@ -108,11 +108,11 @@ public class PlayerManager : Photon.PunBehaviour
         var dist = relativePos.magnitude;
         var pointInWorld = GameManager.Instance.localEye.transform.position +
                            dist * GameManager.Instance.localEye.transform.forward.normalized;
-        var radius = dist*Mathf.Tan(9f);
+        var radius = dist* Mathf.Tan(9f * Mathf.PI / 180f);
 
         GazeIndicator.transform.localScale = Vector3.one*radius;
         GazeIndicator.transform.position = pointInWorld;
-        Quaternion rotation = Quaternion.LookRotation(-relativePos);
+        Quaternion rotation = Quaternion.LookRotation(-GameManager.Instance.localEye.transform.forward);
         GazeIndicator.transform.rotation = rotation;
     }
 
