@@ -80,4 +80,5 @@ MonoBehaviour:
   - RPC_WriteTalkingStatus
   - RPC_StartRecording
   - RPC_StopRecording
+  - RPC_SetDyadType
   DisableAutoOpenWizard: 1

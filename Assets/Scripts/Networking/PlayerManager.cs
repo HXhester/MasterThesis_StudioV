@@ -8,6 +8,7 @@ public class PlayerManager : Photon.PunBehaviour
 {
     private SceneManager_Game _sceneManager;
     private Transform expressionController;
+    private GameObject GazeIndicator;
     [HideInInspector]
     public GameObject Camera;
 
@@ -25,26 +26,32 @@ public class PlayerManager : Photon.PunBehaviour
         if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
         {
             _sceneManager.Has2Avatars = true;
-            if (PhotonNetwork.isMasterClient)
-                return;
-
-            if (GameManager.Instance.UsingVR) {
-                var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-                foreach (GameObject avatar in avatars) {
-                    if (!avatar.GetComponent<PhotonView>().isMine) {
-                        GameManager.Instance.remoteEye = avatar.GetComponent<PlayerManager>().eye.gameObject;
-                        GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().transform.GetComponentInChildren<SetHeadPos>().gameObject;
+            if (!PhotonNetwork.isMasterClient)
+            {
+                if (GameManager.Instance.UsingVR)
+                {
+                    var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    foreach (GameObject avatar in avatars)
+                    {
+                        if (!avatar.GetComponent<PhotonView>().isMine)
+                        {
+                            GameManager.Instance.remoteEye = avatar.GetComponent<PlayerManager>().eye.gameObject;
+                            GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().transform.GetComponentInChildren<SetHeadPos>().gameObject;
+                        }
                     }
                 }
-            } else {
-                var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-                foreach (GameObject avatar in avatars) {
-                    if (!avatar.GetComponent<PhotonView>().isMine) {
-                        GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                else
+                {
+                    var avatars = GameObject.FindGameObjectsWithTag("Avatar");
+                    foreach (GameObject avatar in avatars)
+                    {
+                        if (!avatar.GetComponent<PhotonView>().isMine)
+                        {
+                            GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().OptitrackHead.gameObject;
+                        }
                     }
                 }
-            }
-               
+            }       
         }
         
 
@@ -85,6 +92,29 @@ public class PlayerManager : Photon.PunBehaviour
         GameManager.VRModeChangeDelegate -= DealWithVRmodeChange;
     }
 
+    void Start()
+    {
+        if (photonView.isMine)
+            GazeIndicator = GameObject.Instantiate(Resources.Load("GazeIndicator", typeof(GameObject))) as GameObject;
+    }
+
+    void Update()
+    {
+        if (!photonView.isMine)
+            return;
+
+        var relativePos = GameManager.Instance.remoteEye.transform.position -
+                          GameManager.Instance.localEye.transform.position;
+        var dist = relativePos.magnitude;
+        var pointInWorld = GameManager.Instance.localEye.transform.position +
+                           dist * GameManager.Instance.localEye.transform.forward.normalized;
+        var radius = dist*Mathf.Tan(9f);
+
+        GazeIndicator.transform.localScale = Vector3.one*radius;
+        GazeIndicator.transform.position = pointInWorld;
+        Quaternion rotation = Quaternion.LookRotation(-relativePos);
+        GazeIndicator.transform.rotation = rotation;
+    }
 
     void DealWithVRmodeChange() {
         
@@ -96,8 +126,7 @@ public class PlayerManager : Photon.PunBehaviour
 
         // if using vr, then only see local avatar
         if (GameManager.Instance.UsingVR)
-        {
-            Debug.Log("is using vr");
+        {           
             localOptitrackAnimator.gameObject.SetActive(true);
             remoteOptitrackAnimator.gameObject.SetActive(false);
 
@@ -151,8 +180,9 @@ public class PlayerManager : Photon.PunBehaviour
                 // Don't render hmd layer
                 var headCam = new GameObject("HeadCam");
                 var headcamComponent = headCam.AddComponent<Camera>();
+                var eyeOnHeadPos = OptitrackHead.Find("Eye_L").transform.localPosition;
                 headCam.transform.parent = OptitrackHead;
-                headCam.transform.localPosition = new Vector3(0, 0, 0.13f);
+                headCam.transform.localPosition = new Vector3(0, eyeOnHeadPos.y, eyeOnHeadPos.z);
 
                 headcamComponent.nearClipPlane = 0.01f;
                 headcamComponent.cullingMask &= ~(1 << LayerMask.NameToLayer("HMD"));
@@ -182,20 +212,6 @@ public class PlayerManager : Photon.PunBehaviour
         }
     }
 
-    //This method is only called by Avatars
-    public void SetLayerTo(PlayerManager playerManager, string layer)
-    {
-        playerManager.localOptitrackAnimator.gameObject.SetActive(true);
-        playerManager.remoteOptitrackAnimator.gameObject.SetActive(false);
-        foreach (Transform t in playerManager.remoteOptitrackAnimator.transform)
-        {
-            if (t.gameObject.activeInHierarchy)
-            {
-                t.gameObject.layer = LayerMask.NameToLayer(layer);
-            }
-        }
-    }
-
     public void SetSkeletonName()
     {
         if (photonView.isMine)
@@ -204,18 +220,6 @@ public class PlayerManager : Photon.PunBehaviour
             {
                 gameObject.name,
                 PlayerPrefs.GetString("SkeletonName")
-            });
-        }
-    }
-
-    public void SetSkeletonName(string skeletonName)
-    {
-        if (photonView.isMine)
-        {
-            photonView.RPC("RPC_SetSkeletonName", PhotonTargets.AllBuffered, new object[]
-            {
-                gameObject.name,
-                skeletonName
             });
         }
     }

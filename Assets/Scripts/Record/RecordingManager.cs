@@ -42,17 +42,19 @@ public class RecordingManager : Photon.PunBehaviour {
     void Update () {
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
-            // TODO: Log eye gaze behavior using hitmesh method         
-            // ==========================Recording for one-way gaze=====================================
-            LogOtherBehavioursEyes(sw_individualEyeGaze, GameManager.Instance.localEye, GameManager.Instance.remoteEye);
-
-            // ==========================Recording for head in vr mode==================================
             if (GameManager.Instance.UsingVR)
             {
+                LogOtherBehavioursEyes(sw_individualEyeGaze, GameManager.Instance.localEye,
+                    GameManager.Instance.remoteEye);
                 LogOtherBehavioursHeads(sw_individualHeadGaze, GameManager.Instance.localHead, GameManager.Instance.remoteHead);
             }
-            
-            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + MicInput.Instance.MicLoudness);           
+            else
+            {
+                LogOtherBehavioursHeads(sw_individualHeadGaze, GameManager.Instance.localHead, GameManager.Instance.remoteHead);
+
+            }
+
+            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + MicInput.Instance.MicLoudness);                              
         }
     }
 
