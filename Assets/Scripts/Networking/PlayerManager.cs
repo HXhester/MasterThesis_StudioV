@@ -11,6 +11,7 @@ public class PlayerManager : Photon.PunBehaviour
     private GameObject GazeReceiver;
     private RectTransform GazeIndicator;
     private RectTransform CanvasRect;
+    private GameObject localeyeorig;
     [HideInInspector]
     public GameObject Camera;
 
@@ -109,17 +110,17 @@ public class PlayerManager : Photon.PunBehaviour
         if (!photonView.isMine)
             return;
 
-        GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 0, 0);
+        GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 1f, 0);
         if (GameManager.Instance.localEye.transform.position.x > GazeReceiver.transform.position.x)
         {
-            GazeReceiver.transform.localEulerAngles = new Vector3(90f, 0, -90f);
+            GazeReceiver.transform.localEulerAngles = new Vector3(0, 0, 180f);
         }
 
         RaycastHit hit;
         Vector3 pointOnScreen;
 
         if (Physics.Raycast(GameManager.Instance.localEye.transform.position,
-            GameManager.Instance.localEye.transform.forward, out hit))
+           localeyeorig.transform.forward, out hit))
         {
             pointOnScreen = Camera.GetComponent<Camera>().WorldToViewportPoint(hit.point);
             Vector2 WorldObject_ScreenPosition =
@@ -158,14 +159,14 @@ public class PlayerManager : Photon.PunBehaviour
                 GameManager.Instance.localEye = Camera;
                 GameManager.Instance.localHead = GetComponentInChildren<SetHeadPos>().gameObject;
 
-                var eyeOrig = new GameObject("EyeOrig");
-                eyeOrig.transform.SetParent(Camera.transform);
-                eyeOrig.name = GameManager.Instance.localAvatar.name;
-                eyeOrig.transform.localPosition = Vector3.zero;
-                var raycaster = eyeOrig.AddComponent<EyeRaycaster>();
+                localeyeorig = new GameObject("EyeOrig");
+                localeyeorig.transform.SetParent(Camera.transform);
+                localeyeorig.name = GameManager.Instance.localAvatar.name;
+                localeyeorig.transform.localPosition = Vector3.zero;
+                var raycaster = localeyeorig.AddComponent<EyeRaycaster>();
                 if (raycaster != null)
                 {
-                    raycaster.eyeOrig = eyeOrig;
+                    raycaster.eyeOrig = localeyeorig;
                 }
                 
 
