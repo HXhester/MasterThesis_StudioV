@@ -13,12 +13,16 @@ public class EyeRaycaster : MonoBehaviour {
     public GameObject eyeOrig;
 
     private bool rayToggler;
-    
 
     void Update()
     {
         if(eyeOrig == null)
             return;
+
+        if (SubscribingToHMDGazeData.SubscribingInstance != null) {
+            var _gazeDirection = SubscribingToHMDGazeData.SubscribingInstance.GazeDirection;
+            eyeOrig.transform.forward = _gazeDirection;
+        }
 
         //var ray = new Ray(transform.position, SubscribingToHMDGazeData.SubscribingInstance.GazeDirection);
         //RaycastHit info;
