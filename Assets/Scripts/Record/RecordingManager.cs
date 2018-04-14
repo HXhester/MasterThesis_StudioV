@@ -104,17 +104,18 @@ public class RecordingManager : Photon.PunBehaviour {
         IsRecording = true;
 
         // ===============================Deal with at the begining of recording=======================
-        if (IsAGazingB(GameManager.Instance.localEye, GameManager.Instance.remoteEye)) {
-            sw_individualEyeGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts eye gazing");
-            _wasAGazingBLastFrame_Eyes = true;
-        }
-
-        if(!GameManager.Instance.UsingVR)
-            return;
-        
         if (IsAGazingB(GameManager.Instance.localHead, GameManager.Instance.remoteHead)) {
             sw_individualHeadGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts head gazing");
             _wasAGazingBLastFrame_Heads = true;
+        }
+        
+
+        if(!GameManager.Instance.UsingVR)
+            return;
+
+        if (IsAGazingB(GameManager.Instance.localEye, GameManager.Instance.remoteEye)) {
+            sw_individualEyeGaze.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",starts eye gazing");
+            _wasAGazingBLastFrame_Eyes = true;
         }
 
         if (IsAGazingB_hitmesh(GameManager.Instance.localEye.transform))

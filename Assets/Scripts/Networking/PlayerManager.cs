@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using HTC.UnityPlugin.StereoRendering;
 
-public class PlayerManager : Photon.PunBehaviour
-{
+public class PlayerManager : Photon.PunBehaviour {
     private SceneManager_Game _sceneManager;
     private Transform expressionController;
     private GameObject GazeReceiver;
@@ -26,51 +25,38 @@ public class PlayerManager : Photon.PunBehaviour
     void OnEnable() {
         gameObject.name += photonView.viewID.ToString();
         _sceneManager = FindObjectOfType<SceneManager_Game>();
-        if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2)
-        {
+        if (GameObject.FindGameObjectsWithTag("Avatar").Length == 2) {
             _sceneManager.Has2Avatars = true;
-            if (!PhotonNetwork.isMasterClient)
-            {
-                if (GameManager.Instance.UsingVR)
-                {
+            if (!PhotonNetwork.isMasterClient) {
+                if (GameManager.Instance.UsingVR) {
                     var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-                    foreach (GameObject avatar in avatars)
-                    {
-                        if (!avatar.GetComponent<PhotonView>().isMine)
-                        {
+                    foreach (GameObject avatar in avatars) {
+                        if (!avatar.GetComponent<PhotonView>().isMine) {
                             GameManager.Instance.remoteEye = avatar.GetComponent<PlayerManager>().eye.gameObject;
                             GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().transform.GetComponentInChildren<SetHeadPos>().gameObject;
                         }
                     }
-                }
-                else
-                {
+                } else {
                     var avatars = GameObject.FindGameObjectsWithTag("Avatar");
-                    foreach (GameObject avatar in avatars)
-                    {
-                        if (!avatar.GetComponent<PhotonView>().isMine)
-                        {
+                    foreach (GameObject avatar in avatars) {
+                        if (!avatar.GetComponent<PhotonView>().isMine) {
                             GameManager.Instance.remoteHead = avatar.GetComponent<PlayerManager>().OptitrackHead.gameObject;
                         }
                     }
                 }
-            }       
+            }
         }
-        
+
 
         expressionController = GameObject.FindGameObjectWithTag("ExpressionController").transform;
         GameManager.VRModeChangeDelegate += DealWithVRmodeChange;
 
         // Master client
-        if (PhotonNetwork.isMasterClient)
-        {
-            if (GameManager.Instance.UsingVR)
-            {
+        if (PhotonNetwork.isMasterClient) {
+            if (GameManager.Instance.UsingVR) {
                 localOptitrackAnimator.gameObject.SetActive(true);
                 remoteOptitrackAnimator.gameObject.SetActive(false);
-            }
-            else
-            {
+            } else {
                 localOptitrackAnimator.gameObject.SetActive(false);
                 remoteOptitrackAnimator.gameObject.SetActive(true);
             }
@@ -95,19 +81,16 @@ public class PlayerManager : Photon.PunBehaviour
         GameManager.VRModeChangeDelegate -= DealWithVRmodeChange;
     }
 
-    void Start()
-    {
-        if (photonView.isMine)
-        {
+    void Start() {
+        if (photonView.isMine) {
             GazeReceiver = GameObject.Instantiate(Resources.Load("Receiver", typeof(GameObject))) as GameObject;
             GazeIndicator = GameObject.Find("GazeIndicator").GetComponent<RectTransform>();
             CanvasRect = GameObject.Find("FaceTrackUI").GetComponent<RectTransform>();
         }
     }
 
-    void Update()
-    {
-        if (!photonView.isMine)
+    void Update() {
+        if (!photonView.isMine || !GameManager.Instance.UsingVR)
             return;
 
         GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 0, 0);
