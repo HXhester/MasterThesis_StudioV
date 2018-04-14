@@ -235,8 +235,7 @@ public class RecordingManager : Photon.PunBehaviour {
                 return true;
             }
                 
-            else
-                return false;
+            return false;
         }
         return false;
     }

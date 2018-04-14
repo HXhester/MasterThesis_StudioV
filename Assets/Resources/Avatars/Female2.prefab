@@ -1213,6 +1213,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4932886671320442}
   - component: {fileID: 114355585417223328}
+  - component: {fileID: 136066332629374692}
   m_Layer: 9
   m_Name: mixamorig:Head
   m_TagString: HMDHead
@@ -4755,7 +4756,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1567302093879372}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -4963,6 +4964,19 @@ MonoBehaviour:
   remoteOptitrackAnimator: {fileID: 114358714743406688}
   OptitrackHead: {fileID: 4337586498124588}
   eye: {fileID: 4011751207670614}
+--- !u!136 &136066332629374692
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1442276200923780}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.07916635
+  m_Height: 0.2366946
+  m_Direction: 1
+  m_Center: {x: 7.1495163e-22, y: 0.0633564, z: 0.0058354586}
 --- !u!137 &137087318536548626
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

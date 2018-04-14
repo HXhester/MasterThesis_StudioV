@@ -8,7 +8,9 @@ public class PlayerManager : Photon.PunBehaviour
 {
     private SceneManager_Game _sceneManager;
     private Transform expressionController;
-    private GameObject GazeIndicator;
+    private GameObject GazeReceiver;
+    private RectTransform GazeIndicator;
+    private RectTransform CanvasRect;
     [HideInInspector]
     public GameObject Camera;
 
@@ -95,7 +97,11 @@ public class PlayerManager : Photon.PunBehaviour
     void Start()
     {
         if (photonView.isMine)
-            GazeIndicator = GameObject.Instantiate(Resources.Load("GazeIndicator", typeof(GameObject))) as GameObject;
+        {
+            GazeReceiver = GameObject.Instantiate(Resources.Load("Receiver", typeof(GameObject))) as GameObject;
+            GazeIndicator = GameObject.Find("GazeIndicator").GetComponent<RectTransform>();
+            CanvasRect = GameObject.Find("FaceTrackUI").GetComponent<RectTransform>();
+        }
     }
 
     void Update()
@@ -103,17 +109,24 @@ public class PlayerManager : Photon.PunBehaviour
         if (!photonView.isMine)
             return;
 
-        var relativePos = GameManager.Instance.remoteEye.transform.position -
-                          GameManager.Instance.localEye.transform.position;
-        var dist = relativePos.magnitude;
-        var pointInWorld = GameManager.Instance.localEye.transform.position +
-                           dist * GameManager.Instance.localEye.transform.forward.normalized;
-        var radius = dist* Mathf.Tan(9f * Mathf.PI / 180f);
+        GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 0, 0);
+        if (GameManager.Instance.localEye.transform.position.x > GazeReceiver.transform.position.x)
+        {
+            GazeReceiver.transform.localEulerAngles = new Vector3(90f, 0, -90f);
+        }
 
-        GazeIndicator.transform.localScale = Vector3.one*radius;
-        GazeIndicator.transform.position = pointInWorld;
-        Quaternion rotation = Quaternion.LookRotation(-GameManager.Instance.localEye.transform.forward);
-        GazeIndicator.transform.rotation = rotation;
+        RaycastHit hit;
+        Vector3 pointOnScreen;
+
+        if (Physics.Raycast(GameManager.Instance.localEye.transform.position,
+            GameManager.Instance.localEye.transform.forward, out hit))
+        {
+            pointOnScreen = Camera.GetComponent<Camera>().WorldToViewportPoint(hit.point);
+            Vector2 WorldObject_ScreenPosition =
+                new Vector2(pointOnScreen.x*CanvasRect.sizeDelta.x - CanvasRect.sizeDelta.x*0.5f,
+                    pointOnScreen.y*CanvasRect.sizeDelta.y - CanvasRect.sizeDelta.y*0.5f);
+            GazeIndicator.anchoredPosition = WorldObject_ScreenPosition;
+        }
     }
 
     void DealWithVRmodeChange() {
