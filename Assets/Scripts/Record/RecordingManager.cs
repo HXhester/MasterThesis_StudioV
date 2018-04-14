@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using Tobii.Research.Unity.CodeExamples;
 using Debug = UnityEngine.Debug;
 /// <summary>
 /// Record mutual gaze on host
@@ -167,6 +168,10 @@ public class RecordingManager : Photon.PunBehaviour {
             
         }
         _wasAGazingBLastFrame_Eyes = IsAGazingB(localEye, remoteEye);
+
+        if (SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness == 0 || SubscribingToHMDGazeData.SubscribingInstance.RightEyeOpenness == 0) {
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",blink");
+        }
     }
 
     void LogOtherBehavioursHeads(StreamWriter sw, GameObject localHead, GameObject remoteHead) {

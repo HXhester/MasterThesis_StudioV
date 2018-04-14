@@ -308,6 +308,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
         var distUI = FindObjectOfType<SceneManager_Game>().DistanceText;
         distUI.text = "Current distance is: " + dist;
+        FindObjectOfType<SceneManager_Game>().CurrentDistance = dist;
     }
 
     [PunRPC]
