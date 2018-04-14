@@ -110,7 +110,7 @@ public class PlayerManager : Photon.PunBehaviour
         if (!photonView.isMine)
             return;
 
-        GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 1f, 0);
+        GazeReceiver.transform.position = new Vector3(GameManager.Instance.remoteEye.transform.position.x, 0, 0);
         if (GameManager.Instance.localEye.transform.position.x > GazeReceiver.transform.position.x)
         {
             GazeReceiver.transform.localEulerAngles = new Vector3(0, 0, 180f);
