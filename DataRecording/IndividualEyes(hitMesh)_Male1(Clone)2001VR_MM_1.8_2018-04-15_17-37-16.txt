@@ -1,0 +1,17 @@
+34.3680405,starts gazing on eye mesh
+34.4954297,ends gazing on eye mesh
+89.4436493,starts gazing on eye mesh
+89.5110841,ends gazing on eye mesh
+89.5490296,starts gazing on eye mesh
+89.6278303,ends gazing on eye mesh
+90.2252031,starts gazing on eye mesh
+90.2466196,ends gazing on eye mesh
+134.4226957,starts gazing on eye mesh
+134.6126544,ends gazing on eye mesh
+137.968598,starts gazing on eye mesh
+137.9890837,ends gazing on eye mesh
+149.6225866,starts gazing on eye mesh
+149.6679113,ends gazing on eye mesh
+167.2833299,starts gazing on eye mesh
+167.3979463,ends gazing on eye mesh
+179.9833688,Stop recording

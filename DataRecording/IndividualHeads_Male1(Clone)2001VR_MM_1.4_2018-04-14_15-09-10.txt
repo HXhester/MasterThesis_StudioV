@@ -1,0 +1,9 @@
+6.0877286,starts head gazing
+10.7719627,head gaze ends
+12.1631935,starts head gazing
+21.3380093,head gaze ends
+24.2208918,starts head gazing
+24.4553943,head gaze ends
+24.6569265,starts head gazing
+28.6024874,head gaze ends
+29.9875646,Stop recording
