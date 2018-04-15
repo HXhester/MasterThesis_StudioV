@@ -1,0 +1,21 @@
+2.980039,starts gazing on eye mesh
+3.2172835,ends gazing on eye mesh
+5.2443945,starts gazing on eye mesh
+5.7697083,ends gazing on eye mesh
+94.398054,starts gazing on eye mesh
+95.10487,ends gazing on eye mesh
+121.9473662,starts gazing on eye mesh
+122.0521097,ends gazing on eye mesh
+124.5493376,starts gazing on eye mesh
+124.5734467,ends gazing on eye mesh
+131.9999749,starts gazing on eye mesh
+132.0767918,ends gazing on eye mesh
+133.4158774,starts gazing on eye mesh
+133.4764668,ends gazing on eye mesh
+157.0918496,starts gazing on eye mesh
+157.2595002,ends gazing on eye mesh
+157.3426311,starts gazing on eye mesh
+157.4118318,ends gazing on eye mesh
+157.7124402,starts gazing on eye mesh
+157.8602011,ends gazing on eye mesh
+179.9749458,Stop recording

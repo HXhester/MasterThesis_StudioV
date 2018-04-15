@@ -1,0 +1,2 @@
+16.1405256,starts head gazing
+30.0069356,Stop recording
