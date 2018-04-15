@@ -134,10 +134,6 @@ public class PlayerManager : Photon.PunBehaviour {
             if (photonView.isMine)
             {
 
-                // TODO: tests if skeleton animator works or not
-                //localOptitrackAnimator.enabled = false;
-                //remoteOptitrackAnimator.enabled = false;
-                
                 //should be camera(eye)
                 GameManager.Instance.localEye = Camera;
                 GameManager.Instance.localHead = GetComponentInChildren<SetHeadPos>().gameObject;
@@ -145,7 +141,7 @@ public class PlayerManager : Photon.PunBehaviour {
                 localeyeorig = new GameObject("EyeOrig");
                 localeyeorig.transform.SetParent(Camera.transform);
                 localeyeorig.name = GameManager.Instance.localAvatar.name;
-                localeyeorig.transform.localPosition = Vector3.zero;
+                localeyeorig.transform.localPosition = Camera.transform.Find("TobiiPro_Origin").transform.localPosition;
                 var raycaster = localeyeorig.AddComponent<EyeRaycaster>();
                 if (raycaster != null)
                 {

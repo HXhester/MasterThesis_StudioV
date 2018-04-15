@@ -143,8 +143,6 @@ public class TobiiPro_Host : MonoBehaviour {
         eyeTrackerOrigin.transform.localScale = Vector3.one;
         eyeTrackerOrigin.transform.localPosition = new Vector3(0, 0, zOffs);
         eyeTrackerOrigin.transform.localRotation = Quaternion.identity;
-        // TODO: to be tested, toggle ray
-        eyeTrackerOrigin.AddComponent<EyeRaycaster>();
 
         _localToWorldTransform = eyeTrackerOrigin.transform;
     }
