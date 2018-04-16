@@ -81,4 +81,5 @@ MonoBehaviour:
   - RPC_StartRecording
   - RPC_StopRecording
   - RPC_SetDyadType
+  - RPC_ToggleInstructionBoard
   DisableAutoOpenWizard: 1
