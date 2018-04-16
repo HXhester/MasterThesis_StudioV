@@ -35,6 +35,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public KeyCode ReStartKey = KeyCode.R;
     public KeyCode ChangeRatingQuestionKey = KeyCode.Q;
     public KeyCode LookForAvatarsKey = KeyCode.L;
+    public KeyCode ToggleInstructionKey = KeyCode.T;
 
     private bool _hasSetAvatars;
     public bool Has2Avatars;
@@ -102,9 +103,11 @@ public class SceneManager_Game : Photon.MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(ToggleInstructionKey))
+            ToggleInstructionBoards();
+
         // Use "Space" key to control for next word, players take turn to guess word
-        // Use "R" key to start next group of words after change rope distance  
-        // Use "alpha 1" key to switch to next time    
+        // Use "R" key to start next group of words after change rope distance    
 
         if (HasStarted)
         {
@@ -195,7 +198,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(LookForAvatarsKey))
         {
             if(_avatarHeads!=null)
                 _avatarHeads.Clear();
@@ -256,6 +259,18 @@ public class SceneManager_Game : Photon.MonoBehaviour
     {
         var recordingManager = FindObjectOfType<RecordingManager>();
         recordingManager.StopRecording();
+    }
+
+    public void ToggleInstructionBoards()
+    {
+        photonView.RPC("RPC_ToggleInstructionBoard",PhotonTargets.All);
+    }
+
+    [PunRPC]
+    void RPC_ToggleInstructionBoard()
+    {
+        _board1.SetActive(!_board1.activeSelf);
+        _board2.SetActive(_board1.activeSelf);
     }
 
     // Call on space key press during "20 Questions"

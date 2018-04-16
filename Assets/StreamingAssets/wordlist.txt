@@ -3,8 +3,7 @@ Animals:whale,duck,owl,kangaroo,koala,cow,parrot,wolf,giraffe,reindeer
 Sports:badminton,hockey,bowling,tennis,baseball,boxing,swimming,golf
 Food:French fries,spaghetti,sushi,steak,meat balls,sandwich
 Drinks:yoghurt,smoothie,tea,soda,cider,beer
-Furniture:lamp,oven,book shelf,sofa,carpet,bath tub,arm chair
+Furniture:book shelf,sofa,carpet,bath tub,arm chair
+Home Appliances:lamp,oven
 Clothes:sneaker,pajama,skirt,hoodie,jeans,belt,sock
-Film/Series:Donald Duck,Harry Potter,Lord of the Rings,Tom and Jerry,Game of Thrones,Friends,Black Mirror
-Brands:Facebook,Snapchat,Tesl,KFC,Coca-Cola,Max,Microsoft,Disney,Dior,IKEA
-Instruments:violin,trumpet,guitar,organ,drum
+Brands:Facebook,Snapchat,Tesla,KFC,Coca-Cola,Max,Microsoft,Disney,Dior,IKEA

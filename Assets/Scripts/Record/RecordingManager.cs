@@ -5,11 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Tobii.Research.Unity.CodeExamples;
 using Debug = UnityEngine.Debug;
-/// <summary>
-/// Record mutual gaze on host
-/// </summary>
-/// 
-/// TODO: manage different file on different client
+
 public class RecordingManager : Photon.PunBehaviour {
 
     private string _eyeFilename;
@@ -24,6 +20,7 @@ public class RecordingManager : Photon.PunBehaviour {
     private StreamWriter sw_individualEyeGaze_HitMesh;  // VR, hit mesh
     private StreamWriter sw_individualHeadGaze;         // Both VR and real, cone
     public StreamWriter sw_audio;                       // Record the loudness each frame; May be do it manually
+    private StreamWriter sw_distance;
     
     private WorldTimer _worldTimer;
     private bool _wasAGazingBLastFrame_Eyes;
@@ -55,7 +52,11 @@ public class RecordingManager : Photon.PunBehaviour {
 
             }
 
-            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + MicInput.Instance.MicLoudness);                              
+            sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + MicInput.Instance.MicLoudness);
+
+            var distVector = GameManager.Instance.remoteHead.transform.position-GameManager.Instance.localHead.transform.position;
+            sw_distance.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," + distVector.x + "," +
+                                  distVector.y + "," + distVector.z);
         }
     }
 
@@ -92,6 +93,7 @@ public class RecordingManager : Photon.PunBehaviour {
         string _individualEyesHitMesh = path + "IndividualEyes(hitMesh)_" + nameBase + ".txt";
         string _individualHeads = path + "IndividualHeads_" + nameBase + ".txt";
         string _audioFile = path + "Audio_" + nameBase + ".txt";
+        string _distanceFile = path + "Distance_" + nameBase + ".txt";
        
         if (GameManager.Instance.UsingVR)
         {
@@ -100,6 +102,7 @@ public class RecordingManager : Photon.PunBehaviour {
         }
         sw_individualHeadGaze = new StreamWriter(_individualHeads);
         sw_audio = new StreamWriter(_audioFile);
+        sw_distance = new StreamWriter(_distanceFile);
 
         IsRecording = true;
 
@@ -149,6 +152,12 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_audio.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
             sw_audio.Close();
         }
+
+        if (sw_distance != null)
+        {
+            sw_distance.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
+            sw_distance.Close();
+        }
     }
 
     void LogOtherBehavioursEyes(StreamWriter sw, GameObject localEye, GameObject remoteEye)
@@ -169,7 +178,7 @@ public class RecordingManager : Photon.PunBehaviour {
             
         }
         _wasAGazingBLastFrame_Eyes = IsAGazingB(localEye, remoteEye);
-
+        //TODO: debug blink recording!
         if (SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness == 0 || SubscribingToHMDGazeData.SubscribingInstance.RightEyeOpenness == 0) {
             sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",blink");
         }
