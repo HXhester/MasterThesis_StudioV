@@ -80,6 +80,9 @@ public class RecordingManager : Photon.PunBehaviour {
 
     public void StartRecording()
     {
+        if (PhotonNetwork.isMasterClient)
+            return;
+
         string dyadType = GameManager.Instance.DyadType;
         string distance = GameObject.FindObjectOfType<SceneManager_Game>().CurrentDistance.ToString();
 
@@ -130,7 +133,10 @@ public class RecordingManager : Photon.PunBehaviour {
     }
 
     public void StopRecording()
-    {     
+    {
+        if (PhotonNetwork.isMasterClient)
+            return;
+
         IsRecording = false;
         
         if (sw_individualEyeGaze != null)
