@@ -62,6 +62,7 @@ public class TobiiPro_CalibrationView : MonoBehaviour {
             return false;
         }
 
+        // todo: instantiate a place to receive gaze indicator while calibrate
         _instance = Instantiate(TargetPrefab, new Vector3(int.MinValue, int.MinValue), Quaternion.identity) as GameObject;
         _originalScale = _instance.transform.localScale;
         _instance.transform.parent = TobiiPro_Host.Instance.LocalToWorldTransform;

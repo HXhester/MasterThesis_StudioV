@@ -103,7 +103,7 @@ public class PlayerManager : Photon.PunBehaviour {
         RaycastHit hit;
         Vector3 pointOnScreen;
 
-        if (Physics.Raycast(GameManager.Instance.localEye.transform.position,
+        if (Physics.Raycast(localeyeorig.transform.position,
            localeyeorig.transform.forward, out hit))
         {
             pointOnScreen = Camera.GetComponent<Camera>().WorldToViewportPoint(hit.point);
