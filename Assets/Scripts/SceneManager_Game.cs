@@ -269,8 +269,10 @@ public class SceneManager_Game : Photon.MonoBehaviour
     [PunRPC]
     void RPC_ToggleInstructionBoard()
     {
-        _board1.SetActive(!_board1.activeSelf);
-        _board2.SetActive(_board1.activeSelf);
+        var boardObj1 = _board1.transform.parent.parent.gameObject;
+        var boardObj2 = _board2.transform.parent.parent.gameObject;
+        boardObj1.SetActive(!boardObj1.activeSelf);
+        boardObj2.SetActive(boardObj1.activeSelf);
     }
 
     // Call on space key press during "20 Questions"
