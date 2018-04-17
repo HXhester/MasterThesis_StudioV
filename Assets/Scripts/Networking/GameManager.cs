@@ -14,6 +14,7 @@ public class GameManager : Photon.PunBehaviour
     public GameObject localAvatar;
     public string DyadType;
     public bool UsingVR;
+    public bool IsExperiment;
 
     public GameObject localEye;
     public GameObject remoteEye;

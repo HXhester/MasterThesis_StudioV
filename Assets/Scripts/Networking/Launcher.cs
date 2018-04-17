@@ -13,6 +13,7 @@ namespace Com.MTGTech.MyGame{
 		public Text spawnAsText;
 		public Text sceneToLoadText;
 	    public Toggle isUsingVR;
+        public Toggle isExperiment;
 
 		/// <summary>
 		/// This client's version number. Users are separated from each other by gameversion (which allows you to make breaking changes).
@@ -75,6 +76,8 @@ namespace Com.MTGTech.MyGame{
             {
                 PlayerPrefs.SetFloat("ActorHeight", float.Parse(actorHeight.text));
             }
+
+            GameManager.Instance.IsExperiment = isExperiment.isOn;
         }
         #endregion
 

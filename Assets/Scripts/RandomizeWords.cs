@@ -15,11 +15,9 @@ public class RandomizeWords : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        // TODO: change wordlist
-        // TODO: try out build files
         CategoryWordDict = new Dictionary<string, string>();
        
-        if (Environment.CommandLine.Contains("Experiment"))
+        if (GameManager.Instance.IsExperiment)
         {
             using (StreamReader sr = new StreamReader(Application.streamingAssetsPath + "/wordlist.txt"))
             {
