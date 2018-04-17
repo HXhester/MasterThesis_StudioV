@@ -212,7 +212,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public void StartGame()
     {
         photonView.RPC("RPC_StartGame", PhotonTargets.All);
-        photonView.RPC("RPC_StartRecording",PhotonTargets.Others);
+        photonView.RPC("RPC_StartRecording",PhotonTargets.All);
 
         Debug.Log("20 Questions game Start!");
     }
@@ -220,7 +220,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     public void StopGame()
     {
         photonView.RPC("RPC_StopGame", PhotonTargets.All);
-        photonView.RPC("RPC_StopRecording", PhotonTargets.Others);
+        photonView.RPC("RPC_StopRecording", PhotonTargets.All);
 
         Debug.Log("20 Questions game Stop!");
     }
