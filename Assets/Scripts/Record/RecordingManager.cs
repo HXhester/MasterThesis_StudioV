@@ -27,6 +27,7 @@ public class RecordingManager : Photon.PunBehaviour {
     private bool _wasAGazingBLastFrame_Heads;
     private bool _wasAGazingBLastFrame_EyeHitMesh;
     private bool _wasTalkingLastFrame;
+    private bool _wasBlinkingLastFrame;
 
     [HideInInspector]
     public bool IsRecording = false;
@@ -178,10 +179,14 @@ public class RecordingManager : Photon.PunBehaviour {
             
         }
         _wasAGazingBLastFrame_Eyes = IsAGazingB(localEye, remoteEye);
-        //TODO: debug blink recording!
-        if (SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness == 0 || SubscribingToHMDGazeData.SubscribingInstance.RightEyeOpenness == 0) {
-            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",blink");
+        
+
+        if (!_wasBlinkingLastFrame && SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness == 0) {
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",blink start");
+        } else if (_wasBlinkingLastFrame && SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness != 0) {
+            sw.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",blink end");
         }
+        _wasBlinkingLastFrame = (SubscribingToHMDGazeData.SubscribingInstance.LeftEyeOpenness == 0);
     }
 
     void LogOtherBehavioursHeads(StreamWriter sw, GameObject localHead, GameObject remoteHead) {
