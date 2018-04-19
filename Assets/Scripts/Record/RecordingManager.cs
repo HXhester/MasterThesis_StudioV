@@ -26,7 +26,6 @@ public class RecordingManager : Photon.PunBehaviour {
     private bool _wasAGazingBLastFrame_Eyes;
     private bool _wasAGazingBLastFrame_Heads;
     private bool _wasAGazingBLastFrame_EyeHitMesh;
-    private bool _wasTalkingLastFrame;
     private bool _wasBlinkingLastFrame;
 
     [HideInInspector]
@@ -138,6 +137,10 @@ public class RecordingManager : Photon.PunBehaviour {
             return;
 
         IsRecording = false;
+        _wasAGazingBLastFrame_Eyes = false;
+        _wasAGazingBLastFrame_EyeHitMesh = false;
+        _wasAGazingBLastFrame_Heads = false;
+        _wasBlinkingLastFrame = false;
         
         if (sw_individualEyeGaze != null)
         {
