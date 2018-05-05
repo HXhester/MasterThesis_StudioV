@@ -17,6 +17,7 @@ public class RecordingManager : Photon.PunBehaviour {
 
     // File record on Client
     private StreamWriter sw_individualEyeGaze;          // VR, cone
+    private StreamWriter sw_eyeGazeRawData;
     private StreamWriter sw_individualEyeGaze_HitMesh;  // VR, hit mesh
     private StreamWriter sw_individualHeadGaze;         // Both VR and real, cone
     public StreamWriter sw_audio;                       // Record the loudness each frame; May be do it manually
@@ -42,6 +43,11 @@ public class RecordingManager : Photon.PunBehaviour {
         {
             if (GameManager.Instance.UsingVR)
             {
+                sw_eyeGazeRawData.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," +
+                            GameManager.Instance.localEye.transform.localRotation.x + "," +
+                            GameManager.Instance.localEye.transform.localRotation.y + "," +
+                            GameManager.Instance.localEye.transform.localRotation.z);
+
                 LogOtherBehavioursEyes(sw_individualEyeGaze, GameManager.Instance.localEye,
                     GameManager.Instance.remoteEye);
                 LogOtherBehavioursHeads(sw_individualHeadGaze, GameManager.Instance.localHead, GameManager.Instance.remoteHead);
@@ -98,10 +104,13 @@ public class RecordingManager : Photon.PunBehaviour {
         string _audioFile = path + "Audio_" + nameBase + ".txt";
         string _distanceFile = path + "Distance_" + nameBase + ".txt";
        
+        string _eyeRawFile = path + "EyeGazeRawData_" + nameBase + ".txt";
+
         if (GameManager.Instance.UsingVR)
         {
             sw_individualEyeGaze = new StreamWriter(_individualEyes);
             sw_individualEyeGaze_HitMesh = new StreamWriter(_individualEyesHitMesh);
+            sw_eyeGazeRawData = new StreamWriter(_eyeRawFile);
         }
         sw_individualHeadGaze = new StreamWriter(_individualHeads);
         sw_audio = new StreamWriter(_audioFile);
@@ -168,6 +177,13 @@ public class RecordingManager : Photon.PunBehaviour {
             sw_distance.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
             sw_distance.Close();
         }
+
+        if (sw_eyeGazeRawData != null)
+        {
+            sw_eyeGazeRawData.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + ",Stop recording");
+            sw_eyeGazeRawData.Close();
+        }
+
     }
 
     void LogOtherBehavioursEyes(StreamWriter sw, GameObject localEye, GameObject remoteEye)
