@@ -41,6 +41,9 @@ public class RecordingManager : Photon.PunBehaviour {
     void Update () {
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
+            if (!GameManager.Instance.IsExperiment)
+                return;
+
             if (GameManager.Instance.UsingVR)
             {
                 sw_eyeGazeRawData.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," +
@@ -71,6 +74,9 @@ public class RecordingManager : Photon.PunBehaviour {
         // Use raycast hit for checking if there is any eye mesh hit
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
+            if (!GameManager.Instance.IsExperiment)
+                return;
+
             if (GameManager.Instance.UsingVR)
                 LogEyeGazeHitMesh(sw_individualEyeGaze_HitMesh,GameManager.Instance.localEye);
         }
@@ -85,7 +91,9 @@ public class RecordingManager : Photon.PunBehaviour {
 
     public void StartRecording()
     {
-        if (PhotonNetwork.isMasterClient)
+        IsRecording = true;
+
+        if (PhotonNetwork.isMasterClient || !GameManager.Instance.IsExperiment)
             return;
 
         string dyadType = GameManager.Instance.DyadType;
@@ -116,7 +124,6 @@ public class RecordingManager : Photon.PunBehaviour {
         sw_audio = new StreamWriter(_audioFile);
         sw_distance = new StreamWriter(_distanceFile);
 
-        IsRecording = true;
 
         // ===============================Deal with at the begining of recording=======================
         if (IsAGazingB(GameManager.Instance.localHead, GameManager.Instance.remoteHead)) {
@@ -142,10 +149,11 @@ public class RecordingManager : Photon.PunBehaviour {
 
     public void StopRecording()
     {
-        if (PhotonNetwork.isMasterClient)
+        IsRecording = false;
+
+        if (PhotonNetwork.isMasterClient || !GameManager.Instance.IsExperiment)
             return;
 
-        IsRecording = false;
         _wasAGazingBLastFrame_Eyes = false;
         _wasAGazingBLastFrame_EyeHitMesh = false;
         _wasAGazingBLastFrame_Heads = false;
