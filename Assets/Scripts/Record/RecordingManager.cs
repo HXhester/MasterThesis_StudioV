@@ -41,8 +41,6 @@ public class RecordingManager : Photon.PunBehaviour {
     void Update () {
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
-            if (!GameManager.Instance.IsExperiment)
-                return;
 
             if (GameManager.Instance.UsingVR)
             {
@@ -74,9 +72,6 @@ public class RecordingManager : Photon.PunBehaviour {
         // Use raycast hit for checking if there is any eye mesh hit
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
-            if (!GameManager.Instance.IsExperiment)
-                return;
-
             if (GameManager.Instance.UsingVR)
                 LogEyeGazeHitMesh(sw_individualEyeGaze_HitMesh,GameManager.Instance.localEye);
         }
@@ -93,7 +88,7 @@ public class RecordingManager : Photon.PunBehaviour {
     {
         IsRecording = true;
 
-        if (PhotonNetwork.isMasterClient || !GameManager.Instance.IsExperiment)
+        if (PhotonNetwork.isMasterClient)
             return;
 
         string dyadType = GameManager.Instance.DyadType;
@@ -151,7 +146,7 @@ public class RecordingManager : Photon.PunBehaviour {
     {
         IsRecording = false;
 
-        if (PhotonNetwork.isMasterClient || !GameManager.Instance.IsExperiment)
+        if (PhotonNetwork.isMasterClient)
             return;
 
         _wasAGazingBLastFrame_Eyes = false;
