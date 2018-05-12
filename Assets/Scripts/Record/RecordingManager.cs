@@ -34,7 +34,7 @@ public class RecordingManager : Photon.PunBehaviour {
 
     // Use this for initialization
     void Start () {
-        _worldTimer = GetComponent<WorldTimer>();       
+        _worldTimer = GetComponent<WorldTimer>()       
     }
 
     // Update is called once per frame
