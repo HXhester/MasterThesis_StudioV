@@ -41,6 +41,7 @@ public class RecordingManager : Photon.PunBehaviour {
     void Update () {
         if (!PhotonNetwork.isMasterClient && IsRecording)
         {
+
             if (GameManager.Instance.UsingVR)
             {
                 sw_eyeGazeRawData.WriteLine(_worldTimer.ElapsedTimeSinceStart.TotalSeconds + "," +
@@ -85,6 +86,8 @@ public class RecordingManager : Photon.PunBehaviour {
 
     public void StartRecording()
     {
+        IsRecording = true;
+
         if (PhotonNetwork.isMasterClient)
             return;
 
@@ -117,7 +120,6 @@ public class RecordingManager : Photon.PunBehaviour {
         sw_audio = new StreamWriter(_audioFile);
         sw_distance = new StreamWriter(_distanceFile);
 
-        IsRecording = true;
 
         // ===============================Deal with at the begining of recording=======================
         if (IsAGazingB(GameManager.Instance.localHead, GameManager.Instance.remoteHead)) {
@@ -143,11 +145,12 @@ public class RecordingManager : Photon.PunBehaviour {
 
     public void StopRecording()
     {
+        IsRecording = false;
+
         if (PhotonNetwork.isMasterClient)
             return;
 
         Debug.Log("Closing recording files!");
-        IsRecording = false;
         _wasAGazingBLastFrame_Eyes = false;
         _wasAGazingBLastFrame_EyeHitMesh = false;
         _wasAGazingBLastFrame_Heads = false;
