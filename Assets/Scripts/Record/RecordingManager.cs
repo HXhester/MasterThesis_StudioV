@@ -88,6 +88,7 @@ public class RecordingManager : Photon.PunBehaviour {
         if (PhotonNetwork.isMasterClient)
             return;
 
+        Debug.Log("Start create recording files!");
         string dyadType = GameManager.Instance.DyadType;
         string distance = GameObject.FindObjectOfType<SceneManager_Game>().CurrentDistance.ToString();
 
@@ -145,6 +146,7 @@ public class RecordingManager : Photon.PunBehaviour {
         if (PhotonNetwork.isMasterClient)
             return;
 
+        Debug.Log("Closing recording files!");
         IsRecording = false;
         _wasAGazingBLastFrame_Eyes = false;
         _wasAGazingBLastFrame_EyeHitMesh = false;

@@ -5,5 +5,6 @@ Food:French fries,spaghetti,sushi,steak,meat balls,sandwich
 Drinks:yoghurt,smoothie,tea,soda,cider,beer
 Furniture:book shelf,sofa,carpet,bath tub,arm chair
 Home Appliances:lamp,oven
-Clothes:sneaker,pajama,skirt,hoodie,jeans,belt,sock
+Clothes:sneaker,pajama,skirt,hoodie,jeans
+Accessories:socks,belt
 Brands:Facebook,Snapchat,Tesla,KFC,Coca-Cola,Max,Microsoft,Disney,Dior,IKEA
