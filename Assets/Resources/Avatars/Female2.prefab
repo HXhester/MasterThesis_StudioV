@@ -172,7 +172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4344299000470772}
   m_Layer: 10
-  m_Name: r_Eye_R
+  m_Name: Eye_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -293,7 +293,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4007531122662204}
   m_Layer: 10
-  m_Name: r_Eye_L
+  m_Name: Eye_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
