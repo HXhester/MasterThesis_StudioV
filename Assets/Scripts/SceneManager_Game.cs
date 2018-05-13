@@ -214,7 +214,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         photonView.RPC("RPC_StartGame", PhotonTargets.All);
         photonView.RPC("RPC_StartRecording",PhotonTargets.All);
 
-        Debug.Log("20 Questions game Start!");
+        
     }
 
     public void StopGame()
@@ -222,7 +222,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
         photonView.RPC("RPC_StopGame", PhotonTargets.All);
         photonView.RPC("RPC_StopRecording", PhotonTargets.All);
 
-        Debug.Log("20 Questions game Stop!");
+       
     }
 
     [PunRPC]
@@ -236,6 +236,8 @@ public class SceneManager_Game : Photon.MonoBehaviour
         _inGameRatingUI[1].SetActive(false);
 
         _worldTimer.StartTimer();
+
+        Debug.Log("20 Questions game Start!");
     }
 
     [PunRPC]
@@ -245,11 +247,14 @@ public class SceneManager_Game : Photon.MonoBehaviour
         GameObject.Find("StartButton").GetComponent<Button>().interactable = true;
         _worldTimer.StopTimer();
         _worldTimer.ResetTimer();
+
+        Debug.Log("20 Questions game Stop!");
     }
 
     [PunRPC]
     void RPC_StartRecording()
     {
+        Debug.Log("Send start recording RPC.");
         var recordingManager = FindObjectOfType<RecordingManager>();
         recordingManager.StartRecording();
     }
@@ -257,6 +262,7 @@ public class SceneManager_Game : Photon.MonoBehaviour
     [PunRPC]
     void RPC_StopRecording()
     {
+        Debug.Log("Send stop recording RPC.");
         var recordingManager = FindObjectOfType<RecordingManager>();
         recordingManager.StopRecording();
     }

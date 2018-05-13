@@ -115,7 +115,8 @@ public class PlayerManager : Photon.PunBehaviour {
 
         // if using vr, then only see local avatar
         if (GameManager.Instance.UsingVR)
-        {           
+        {
+            Debug.Log("Execute delegation when using VR.");
             localOptitrackAnimator.gameObject.SetActive(true);
             remoteOptitrackAnimator.gameObject.SetActive(false);
 
@@ -150,6 +151,8 @@ public class PlayerManager : Photon.PunBehaviour {
         // if not using vr, then see the remote one
         else
         {
+            Debug.Log("Execute delegation when not using VR.");
+
             localOptitrackAnimator.gameObject.SetActive(false);
             remoteOptitrackAnimator.gameObject.SetActive(true);
 
@@ -191,7 +194,6 @@ public class PlayerManager : Photon.PunBehaviour {
     void ToggleAvatarUI() {
         GameObject[] avatarUi = GameObject.FindGameObjectsWithTag("AvatarUI");
         bool usingvr = GameManager.Instance.UsingVR;
-        Debug.Log("is using vr: " + usingvr);
         foreach (GameObject go in avatarUi) {
             go.GetComponent<Canvas>().enabled = usingvr;
         }
